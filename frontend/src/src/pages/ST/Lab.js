@@ -146,7 +146,8 @@ function Lab() {
             const Data = await response.json()
             if (Data.success){
               withReactContent(Swal).fire({
-                  title: `Question ${i} submitted successfully`,
+                  title: Data['msg'],
+                  text: Data['data']['msg'],
                   icon: "success"
               }).then(ok => {
                   if(ok)

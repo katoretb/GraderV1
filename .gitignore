@@ -36,3 +36,4 @@ __pycache__
 test.py
 .DS_Store
 client_secrets.json
+scvrb.txt

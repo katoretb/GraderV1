@@ -1,4 +1,4 @@
-name: Auth
+name: AUTH
  
 on:
   push:
@@ -24,24 +24,32 @@ jobs:
       -
         name: Checkout repository
         uses: actions/checkout@v3
-      -
-        name: Make ENVFILE (LATEST)
+      - 
+        name: Create .env file
         if: github.ref_name == 'latest'
-        uses: SpicyPizza/create-envfile@v2.0
-        with:
-          envkey_COOKIE_SECRET: ${{ secrets.PROD_JWT_SECRET_KEY }}
-          envkey_PUBKEY: ${{ secrets.PROD_PUBKEY }}
-          file_name: .env
-          directory: ./auth/
-      -
-        name: Make ENVFILE (TESTING)
+        run: echo "${{ secrets.PROD_AUTH_VAR }}" > ./auth/.env
+      - 
+        name: Create .env file
         if: github.ref_name == 'testing'
-        uses: SpicyPizza/create-envfile@v2.0
-        with:
-          envkey_COOKIE_SECRET: ${{ secrets.TEST_JWT_SECRET_KEY }}
-          envkey_PUBKEY: ${{ secrets.TEST_PUBKEY }}
-          file_name: .env
-          directory: ./auth/
+        run: echo "${{ secrets.TEST_AUTH_VAR }}" > ./auth/.env
+      # -
+      #   name: Make ENVFILE (LATEST)
+      #   if: github.ref_name == 'latest'
+      #   uses: SpicyPizza/create-envfile@v2.0
+      #   with:
+      #     envkey_COOKIE_SECRET: ${{ secrets.PROD_JWT_SECRET_KEY }}
+      #     envkey_PUBKEY: ${{ secrets.PROD_PUBKEY }}
+      #     file_name: .env
+      #     directory: ./auth/
+      # -
+      #   name: Make ENVFILE (TESTING)
+      #   if: github.ref_name == 'testing'
+      #   uses: SpicyPizza/create-envfile@v2.0
+      #   with:
+      #     envkey_COOKIE_SECRET: ${{ secrets.TEST_JWT_SECRET_KEY }}
+      #     envkey_PUBKEY: ${{ secrets.TEST_PUBKEY }}
+      #     file_name: .env
+      #     directory: ./auth/
       -
         name: create-json (LATEST)
         if: github.ref_name == 'latest'
@@ -86,10 +94,6 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          # Username and Password for DOCKER HUB
-          #username: ${{ secrets.DOCKERHUB_USERNAME }}
-          #password: ${{ secrets.DOCKERHUB_TOKEN }}
-          # Username and Password for GITHUB CONTAINER REGISTRY
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       -
