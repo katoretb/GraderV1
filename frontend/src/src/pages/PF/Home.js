@@ -226,7 +226,7 @@ function HomePF() {
           <div>
             <br></br>
             {/* วนลูปเพื่อแสดง container แยกตามปีการศึกษา */}
-            {Object.entries(classes).map(([year, classes], i) => (
+            {Object.entries(classes).map(([year, classes]) => (
               <div key={year} className="container-lg mb-3 bg-light" style={{ padding: '10px' }}>
                 <h5 className='unselectable' onClick={() => toggleYear(year)} style={{ cursor: 'pointer' }}>
                   {expandedYear === year ? <ChevronDown /> : <ChevronRight />} {year} (Student view)

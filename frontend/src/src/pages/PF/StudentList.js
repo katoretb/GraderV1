@@ -51,6 +51,25 @@ function StudentList() {
   };
 
   useEffect(() => {
+    const fetchName = async () => {
+      try {
+        const response = await fetch(`${host}/TA/Student/List?CSYID=${classId}`, {
+          method: "GET",
+          credentials: "include",
+          headers: {
+              "Content-type": "application/json; charset=UTF-8",
+              "Access-Control-Allow-Origin": "*",
+              "X-CSRF-TOKEN": Cookies.get("csrf_token")
+          }
+        });
+        const dataname = await response.json();
+        setshowname(dataname["data"]["Students"]);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        // Display an error message to the user
+      }
+    };
+
     const fetchClass = async () => {
       try {
         const response = await fetch(`${host}/TA/class/class?CSYID=${classId}`, {
