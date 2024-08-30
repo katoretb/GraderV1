@@ -16,7 +16,7 @@ from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives import serialization
 
 from function.db import get_db
-from function.google import flow, GOOGLE_CLIENT_ID
+# from function.google import flow, GOOGLE_CLIENT_ID
 
 from urllib.parse import urlparse, parse_qs
 

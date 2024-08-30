@@ -71,7 +71,6 @@ func main() {
 	store := cookie.NewStore([]byte(os.Getenv("COOKIE_SECRET")))
 	r.Use(sessions.Sessions("mysession", store))
 
-	// r.GET("/", handleMain)
 	r.GET("/auth/login", handleGoogleLogin)
 	r.GET("/auth/callback", handleGoogleCallback)
 
