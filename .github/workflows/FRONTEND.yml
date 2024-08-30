@@ -87,6 +87,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           flavor: |
             latest=false
+            prefix=frontend-,onlatest=true
           tags: |
             type=ref,event=branch
             type=ref,event=tag
