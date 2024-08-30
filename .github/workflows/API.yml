@@ -75,7 +75,7 @@ jobs:
       -
         name: create-json (LATEST)
         if: github.ref_name == 'latest'
-        id: create-json
+        id: create-json-latest
         uses: jsdaniell/create-json@v1.2.2
         with:
           name: "client_secrets.json"
@@ -84,7 +84,7 @@ jobs:
       -
         name: create-json (TESTING)
         if: github.ref_name == 'testing'
-        id: create-json
+        id: create-json-testing
         uses: jsdaniell/create-json@v1.2.2
         with:
           name: "client_secrets.json"

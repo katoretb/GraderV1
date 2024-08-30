@@ -15,7 +15,7 @@ function TAmanage() {
     const [TAList, setTAList] = useState([]);
     const [AddMail, setAddMail] = useState("");
     const [Keyword, setKeyword] = useState("");
-    const [CSYID, _] = useState(sessionStorage.getItem("CSYID"))
+    const [CSYID, ] = useState(sessionStorage.getItem("CSYID"))
     const [ClassCreator, setClassCreator] = useState("")
 
     const [Email,] = useState(Cookies.get('Email'));
