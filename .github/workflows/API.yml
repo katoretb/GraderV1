@@ -72,24 +72,24 @@ jobs:
       #     envkey_PRIKEY: ${{ secrets.TEST_PRIKEY }}
       #     file_name: .env
       #     directory: ./api/src/config/
-      -
-        name: create-json (LATEST)
-        if: github.ref_name == 'latest'
-        id: create-json-latest
-        uses: jsdaniell/create-json@v1.2.2
-        with:
-          name: "client_secrets.json"
-          json: ${{ secrets.PROD_CLIENT_SECRETS }}
-          dir: 'api/src/config/'
-      -
-        name: create-json (TESTING)
-        if: github.ref_name == 'testing'
-        id: create-json-testing
-        uses: jsdaniell/create-json@v1.2.2
-        with:
-          name: "client_secrets.json"
-          json: ${{ secrets.TEST_CLIENT_SECRETS }}
-          dir: 'api/src/config/'
+      # -
+      #   name: create-json (LATEST)
+      #   if: github.ref_name == 'latest'
+      #   id: create-json-latest
+      #   uses: jsdaniell/create-json@v1.2.2
+      #   with:
+      #     name: "client_secrets.json"
+      #     json: ${{ secrets.PROD_CLIENT_SECRETS }}
+      #     dir: 'api/src/config/'
+      # -
+      #   name: create-json (TESTING)
+      #   if: github.ref_name == 'testing'
+      #   id: create-json-testing
+      #   uses: jsdaniell/create-json@v1.2.2
+      #   with:
+      #     name: "client_secrets.json"
+      #     json: ${{ secrets.TEST_CLIENT_SECRETS }}
+      #     dir: 'api/src/config/'
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3

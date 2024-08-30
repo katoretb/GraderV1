@@ -10,7 +10,7 @@ from flask import app, Flask, Response, g, send_from_directory, send_file, jsoni
 from flask_jwt_extended import JWTManager
 
 # Google
-from function.google import secret_key
+# from function.google import secret_key
 
 from function.db import get_db, get_dbdict
 from function.loadconfig import config, UPLOAD_FOLDER, isDev
@@ -57,7 +57,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 jwt = JWTManager(app)
 
 # setup google authen
-app.secret_key = secret_key
+# app.secret_key = secret_key
 
 # add route to /
 @app.route('/api/')
