@@ -9,8 +9,7 @@ from function.db import get_db
 from function.isIPYNB import isIPYNB
 from function.loadconfig import UPLOAD_FOLDER, config
 from function.isLock import isLock
-from function.gradeInBackground import gradeInBackground
-from function.loadconfig import executor
+import function.grader as grader
 
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import serialization, hashes
@@ -27,12 +26,11 @@ def delete_file(file_path):
 
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-@jwt_required()
 def main():
-    Email = get_jwt_identity()['email']
     conn = get_db()
     cursor = conn.cursor()
     
+    Email = request.form.get("Email")
     UID = Email.split('@')[0]
     uploaded_file = request.files["file"]
     QID = request.form.get("QID")
@@ -268,14 +266,55 @@ def main():
             cursor.execute(sus_query, (UID, LID, QID, 5, "There is problem with signature.", upload_time))
             conn.commit()
             
-        executor.submit(gradeInBackground, Source, addfiles, filepath, QID, MaxScore, UID, LID, upload_time, CSYID, OriginalFileName, Qinfo)
+        if Qinfo is None:
+            Qinfo = grader.QinfoGenerate(Source, addfile=addfiles)
+            Qinfo_query = "UPDATE `question` SET `Qinfo`=%s WHERE `QID`=%s"
+            cursor.execute(Qinfo_query, (json.dumps(Qinfo), QID))
+            conn.commit()
+
+        err, data = grader.grade(Source, filepath, addfile=addfiles, validate=False, check_keyword="ok", timeout=2, Qinfo=Qinfo)
+        if err:
+            return jsonify({
+                'success': False,
+                'msg': f'There is a problem while grading.\n{data}',
+                'data': {}
+            }), 200
+        
+        s, m = 0, 0
+
+        if len(data) == 1:
+            s += float(data[0][0])  # Ensure data is converted to float
+            m += float(data[0][1])  # Ensure data is converted to float
+        else:
+            for j in range(len(data)):
+                s += float(data[j][0])  # Ensure data is converted to float
+                m += float(data[j][1])  # Ensure data is converted to float
+
+        # Check if m is zero to avoid division by zero
+        if m == 0:
+            Score = 0
+        else:
+            Score = float("{:.2f}".format((s / m) * float(MaxScore)))  # Ensure MaxScore is converted to float
+
+        # Define the insert or update query
+        upsert_query = """
+            INSERT INTO submitted (UID, LID, QID, SummitedFile, Score, Timestamp, CSYID, OriginalName)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                SummitedFile = VALUES(SummitedFile),
+                Score = VALUES(Score),
+                Timestamp = VALUES(Timestamp),
+                OriginalName = VALUES(OriginalName)
+        """
+
+        # Execute the query with the provided values
+        cursor.execute(upsert_query, (UID, LID, QID, filepath, Score, upload_time, CSYID, OriginalFileName))
+        conn.commit()          
 
         return jsonify({
             'success': True,
-            'msg': "Submitted success",
-            'data': {
-                "msg": "Score maybe delay."
-            }
+            'msg': "Record inserted successfully",
+            'data': {}
         }), 200
 
     except Exception as e:

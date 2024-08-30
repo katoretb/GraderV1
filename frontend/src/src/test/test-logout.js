@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 
 function Logout(){
-    const [isRun, _] = useState(0);
+    const [isRun, ] = useState(0);
 
     async function run(){
         await fetch(`${process.env.REACT_APP_HOST}/glob/auth/logout`, {

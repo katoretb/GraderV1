@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 
 
 function Callback() {
-    const [isRun, _] = useState(0);
+    const [isRun, ] = useState(0);
 
 
     async function run(){

@@ -69,7 +69,7 @@ function StudentList() {
         // Display an error message to the user
       }
     };
-
+    
     const fetchClass = async () => {
       try {
         const response = await fetch(`${host}/TA/class/class?CSYID=${classId}`, {
