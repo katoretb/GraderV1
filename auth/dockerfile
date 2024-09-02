@@ -8,9 +8,6 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-COPY ./auth/.env ./
-
-
 RUN go build -v -o /usr/local/bin/app ./...
 
 EXPOSE 5050
