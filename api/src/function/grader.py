@@ -142,9 +142,10 @@ def grade(Question, submit, addfile=[], validate=True, timeout=20, check_keyword
                     with redirect_stdout(output):
                         exec("\n\n".join(finalexec), {})
                         
-                if context_manager.state == context_manager.TIMED_OUT:
-                    return True, f"This submittion have stuck in loop that run longer than {timeout} seconds"
-                results = output.getvalue().strip("\n").split("\n")
+                results = [""]
+                if context_manager.state != context_manager.TIMED_OUT:
+                    # return True, f"This submittion have stuck in loop that run longer than {timeout} seconds"
+                    results = output.getvalue().strip("\n").split("\n")
                 isPass = True
                 for result in results:
                     if(result != check_keyword):
