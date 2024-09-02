@@ -121,7 +121,7 @@ def grade(Question, submit, addfile=[], validate=True, timeout=20, check_keyword
     
     #check number of testcase list and solution
     if len(Qinfo["Testcase"]) != len(solution):
-        return True, f"Number of testcase and solution is not match. ({len(Qinfo["Testcase"])} testcase with {len(solution)} solution)"
+        return True, f"Number of testcase and solution is not match. ({len(Qinfo['Testcase'])} testcase with {len(solution)} solution)"
 
     score = []
     num = 0
