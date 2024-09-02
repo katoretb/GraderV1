@@ -60,7 +60,7 @@ func init() {
 		Endpoint:     google.Endpoint,
 	}
 
-	spkiBlock, _ := pem.Decode([]byte(os.Getenv("PUBKEY")))
+	spkiBlock, _ := pem.Decode([]byte("-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7d0dR+ZqVVcrCcXH2hmo\ni9+6rcWPRbWJi3RE9o9sL370Q8ZisQ7pWrQsoWOUEzpEShmuqTkKKveQQtAoEPQc\njVc9utrdBVcMT7rQ6R2MNqT04/E36w53cDdVvhr35Zo3P2xxnKCKUB0gaizE+kQK\nmPsvPRBmUX2Z0tQsy0KfyD9DLBsYp5HdqqLCEIXsXJemfqOL3D33hL8kM2hP0JIv\nX+kLw4JXM03GWt1s3dVcf++ngvMDNnkcnoRJZMeKgMMW+Q0/xw2IgcFVzzVAX1dc\nr8zGf3kdmjHmycQBus/FPDJfQf3U2XAQgssexIQ36i+HELrzDF4A639xzbjnfuEY\nfwIDAQAB\n-----END PUBLIC KEY-----\n"))
 	pubInterface, _ := x509.ParsePKIXPublicKey(spkiBlock.Bytes)
 	spkiKey = pubInterface.(*rsa.PublicKey)
 }
@@ -68,7 +68,7 @@ func init() {
 func main() {
 	r := gin.Default()
 
-	store := cookie.NewStore([]byte(os.Getenv("COOKIE_SECRET")))
+	store := cookie.NewStore([]byte("pM9IMt0Y25cY3Z1QRtKj7PI0b4930GZ937zUs3BX8FwVgy1aotpc7y41vVNjt5B00IRWKj3PHy68A1em9sS6orhQeX9ZVlpLfpDBwiDzkkO3ohbHwmcX1mvHFxnWYcAB"))
 	r.Use(sessions.Sessions("mysession", store))
 
 	r.GET("/auth/login", handleGoogleLogin)
