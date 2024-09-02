@@ -112,7 +112,16 @@ def main():
     data = cur.fetchall()
 
     if FRL[0] == 1:
-        select_query = "SELECT Lab FROM lab WHERE LID = %s"
+        select_query = """
+        SELECT 
+            Lab, 
+            ClassID
+        FROM 
+            lab 
+            LEFT JOIN class ON class.CSYID = lab.CSYID
+        WHERE 
+            LID = 17
+        """
         cur.execute(select_query, (data[0][1],))
         resultLab = cur.fetchone()
 
@@ -125,9 +134,12 @@ def main():
     if FRL[0] == 1:
         prefilename = os.path.split(data[0][0])[-1].split("_")
         if FRL[1] == 0:
-            filename = f'{Email.split("@")[0]}-L{resultLab[0]}-Q{int(prefilename[1]) + 1}-{"_".join(prefilename[2:])}'
+            if not editBefore:
+                filename = f'{Email.split("@")[0]}-L{resultLab[0]}-Q{int(prefilename[1]) + 1}.ipynb'
+            else:
+                filename = f'Release_{str(resultLab[1]).replace(".", "-")}_L{resultLab[0]}_Q{int(prefilename[1]) + 1}.ipynb'
         if FRL[1] == 1:
-            filename = "_".join(prefilename[2:])
+            filename = f'Source_{str(resultLab[1]).replace(".", "-")}_L{resultLab[0]}_Q{int(prefilename[1]) + 1}.ipynb'
 
     file_content = ""
     # Read the file content

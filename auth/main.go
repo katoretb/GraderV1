@@ -31,7 +31,7 @@ var spkiKey *rsa.PublicKey
 func init() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Error loading .env file")
+		log.Fatalf("Error loading .env file ")
 	}
 
 	file, err := os.Open("client_secrets.json")
