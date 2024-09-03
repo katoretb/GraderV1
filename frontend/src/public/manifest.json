@@ -13,6 +13,26 @@
       "sizes": "1536x1536"
     },
     {
+      "src": "kla.png",
+      "type": "image/png",
+      "sizes": "159x200"
+    },
+    {
+      "src": "ice.png",
+      "type": "image/png",
+      "sizes": "159x200"
+    },
+    {
+      "src": "som.png",
+      "type": "image/png",
+      "sizes": "159x200"
+    },
+    {
+      "src": "ek.png",
+      "type": "image/png",
+      "sizes": "159x200"
+    },
+    {
       "src": "gg-con.svg",
       "type": "image/svg"
     }
