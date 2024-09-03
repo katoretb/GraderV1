@@ -25,34 +25,34 @@ jobs:
         name: Checkout repository
         uses: actions/checkout@v3
       
-      - 
-        name: Create .env file
-        if: github.ref_name == 'latest'
-        run: echo "${{ secrets.PROD_FRONT_VAR }}" > ./frontend/src/.env
-      - 
-        name: Create .env file
-        if: github.ref_name == 'testing'
-        run: echo "${{ secrets.TEST_FRONT_VAR }}" > ./frontend/src/.env
-      # -
-      #   name: Make ENVFILE (LATEST)
+      # - 
+      #   name: Create .env file
       #   if: github.ref_name == 'latest'
-      #   uses: SpicyPizza/create-envfile@v2.0
-      #   with:
-      #     envkey_PORT: ${{ secrets.PROD_PORT1 }}
-      #     envkey_REACT_APP_HOST: ${{ secrets.PROD_API }}
-      #     envkey_REACT_APP_DEV: ${{ secrets.PROD_DEV }}
-      #     file_name: .env
-      #     directory: ./frontend/src/
-      # -
-      #   name: Make ENVFILE (TESTING)
+      #   run: echo "${{ secrets.PROD_FRONT_VAR }}" > ./frontend/src/.env
+      # - 
+      #   name: Create .env file
       #   if: github.ref_name == 'testing'
-      #   uses: SpicyPizza/create-envfile@v2.0
-      #   with:
-      #     envkey_PORT: ${{ secrets.TEST_PORT1 }}
-      #     envkey_REACT_APP_HOST: ${{ secrets.TEST_API }}
-      #     envkey_REACT_APP_DEV: ${{ secrets.TEST_DEV }}
-      #     file_name: .env
-      #     directory: ./frontend/src/
+      #   run: echo "${{ secrets.TEST_FRONT_VAR }}" > ./frontend/src/.env
+      -
+        name: Make ENVFILE (LATEST)
+        if: github.ref_name == 'latest'
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_PORT: ${{ secrets.PROD_PORT_FRONT }}
+          envkey_REACT_APP_HOST: ${{ secrets.PROD_API }}
+          envkey_REACT_APP_DEV: ${{ secrets.PROD_DEV }}
+          file_name: .env
+          directory: ./frontend/src/
+      -
+        name: Make ENVFILE (TESTING)
+        if: github.ref_name == 'testing'
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_PORT: ${{ secrets.TEST_PORT_FRONT }}
+          envkey_REACT_APP_HOST: ${{ secrets.TEST_API }}
+          envkey_REACT_APP_DEV: ${{ secrets.TEST_DEV }}
+          file_name: .env
+          directory: ./frontend/src/
       -
         name: Edit nginx.conf (DEVELOPMENT)
         if: github.ref_name == 'testing'
