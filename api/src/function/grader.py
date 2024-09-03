@@ -121,7 +121,7 @@ def grade(Question, submit, addfile=[], validate=True, timeout=20, check_keyword
     
     #check number of testcase list and solution
     if len(Qinfo["Testcase"]) != len(solution):
-        return True, f"Number of testcase and solution is not match. ({len(Qinfo["Testcase"])} testcase with {len(solution)} solution)"
+        return True, f"Number of testcase and solution is not match. ({len(Qinfo['Testcase'])} testcase with {len(solution)} solution)"
 
     score = []
     num = 0
@@ -142,9 +142,10 @@ def grade(Question, submit, addfile=[], validate=True, timeout=20, check_keyword
                     with redirect_stdout(output):
                         exec("\n\n".join(finalexec), {})
                         
-                if context_manager.state == context_manager.TIMED_OUT:
-                    return True, f"This submittion have stuck in loop that run longer than {timeout} seconds"
-                results = output.getvalue().strip("\n").split("\n")
+                results = [""]
+                if context_manager.state != context_manager.TIMED_OUT:
+                    # return True, f"This submittion have stuck in loop that run longer than {timeout} seconds"
+                    results = output.getvalue().strip("\n").split("\n")
                 isPass = True
                 for result in results:
                     if(result != check_keyword):

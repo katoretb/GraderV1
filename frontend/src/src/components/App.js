@@ -7,6 +7,7 @@ import ProfRoutes           from './profRoutes'
 // global
 import Home         from '../pages/Home';
 import ErrorComp    from '../pages/error';
+import ContactList  from '../pages/contact';
 
 // Professor
 import ClassEdit    from '../pages/PF/ClassEdit';
@@ -53,7 +54,7 @@ function App() {
             <Route element={<PublicRoutes />}>
                 <Route element={<Login />} path='login' />
                 <Route element={<Callback />} path='callback' />
-
+                <Route element={<ContactList />} path='contact/kronosB' />
             </Route>
             <Route element={<ErrorComp />} path='*' />
 

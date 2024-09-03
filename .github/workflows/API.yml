@@ -28,50 +28,50 @@ jobs:
         name: Set up the environment
         run: mkdir -p ./api/src/config
 
-      - 
-        name: Create .env file
-        if: github.ref_name == 'latest'
-        run: echo "${{ secrets.PROD_API_VAR }}" > ./api/src/config/.env
-      - 
-        name: Create .env file
-        if: github.ref_name == 'testing'
-        run: echo "${{ secrets.TEST_API_VAR }}" > ./api/src/config/.env
-      # -
-      #   name: Make ENVFILE (LATEST)
+      # - 
+      #   name: Create .env file
       #   if: github.ref_name == 'latest'
-      #   uses: SpicyPizza/create-envfile@v2.0
-      #   with:
-      #     envkey_JWT_SECRET_KEY: ${{ secrets.PROD_JWT_SECRET_KEY }}
-      #     envkey_HOST: ${{ secrets.PROD_HOST }}
-      #     envkey_PORT: ${{ secrets.PROD_PORT }}
-      #     envkey_dev: ${{ secrets.PROD_DEV }}
-      #     envkey_DBHOST: ${{ secrets.PROD_DBHOST }}
-      #     envkey_DBUSER: ${{ secrets.PROD_DBUSER }}
-      #     envkey_DBPASS: ${{ secrets.PROD_DBPASS }}
-      #     envkey_DBNAME: ${{ secrets.PROD_DBNAME }}
-      #     envkey_DOMAIN: ${{ secrets.PROD_DOMAIN }}
-      #     envkey_PUBKEY: ${{ secrets.PROD_PUBKEY }}
-      #     envkey_PRIKEY: ${{ secrets.PROD_PRIKEY }}
-      #     file_name: .env
-      #     directory: ./api/src/config/
-      # -
-      #   name: Make ENVFILE (TESTING)
+      #   run: echo "${{ secrets.PROD_API_VAR }}" > ./api/src/config/.env
+      # - 
+      #   name: Create .env file
       #   if: github.ref_name == 'testing'
-      #   uses: SpicyPizza/create-envfile@v2.0
-      #   with:
-      #     envkey_JWT_SECRET_KEY: ${{ secrets.PROD_JWT_SECRET_KEY }}
-      #     envkey_HOST: ${{ secrets.TEST_HOST }}
-      #     envkey_PORT: ${{ secrets.TEST_PORT }}
-      #     envkey_dev: ${{ secrets.TEST_DEV }}
-      #     envkey_DBHOST: ${{ secrets.TEST_DBHOST }}
-      #     envkey_DBUSER: ${{ secrets.TEST_DBUSER }}
-      #     envkey_DBPASS: ${{ secrets.TEST_DBPASS }}
-      #     envkey_DBNAME: ${{ secrets.TEST_DBNAME }}
-      #     envkey_DOMAIN: ${{ secrets.TEST_DOMAIN }}
-      #     envkey_PUBKEY: ${{ secrets.TEST_PUBKEY }}
-      #     envkey_PRIKEY: ${{ secrets.TEST_PRIKEY }}
-      #     file_name: .env
-      #     directory: ./api/src/config/
+      #   run: echo "${{ secrets.TEST_API_VAR }}" > ./api/src/config/.env
+      -
+        name: Make ENVFILE (LATEST)
+        if: github.ref_name == 'latest'
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_JWT_SECRET_KEY: ${{ secrets.PROD_JWT_SECRET_KEY }}
+          envkey_HOST: ${{ secrets.PROD_HOST }}
+          envkey_PORT: ${{ secrets.PROD_PORT }}
+          envkey_dev: ${{ secrets.PROD_DEV }}
+          envkey_DBHOST: ${{ secrets.PROD_DBHOST }}
+          envkey_DBUSER: ${{ secrets.PROD_DBUSER }}
+          envkey_DBPASS: ${{ secrets.PROD_DBPASS }}
+          envkey_DBNAME: ${{ secrets.PROD_DBNAME }}
+          envkey_DOMAIN: ${{ secrets.PROD_DOMAIN }}
+          envkey_PUBKEY: ${{ secrets.PROD_PUBKEY }}
+          envkey_PRIKEY: ${{ secrets.PROD_PRIKEY }}
+          file_name: .env
+          directory: ./api/src/config/
+      -
+        name: Make ENVFILE (TESTING)
+        if: github.ref_name == 'testing'
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_JWT_SECRET_KEY: ${{ secrets.TEST_JWT_SECRET_KEY }}
+          envkey_HOST: ${{ secrets.TEST_HOST }}
+          envkey_PORT: ${{ secrets.TEST_PORT }}
+          envkey_dev: ${{ secrets.TEST_DEV }}
+          envkey_DBHOST: ${{ secrets.TEST_DBHOST }}
+          envkey_DBUSER: ${{ secrets.TEST_DBUSER }}
+          envkey_DBPASS: ${{ secrets.TEST_DBPASS }}
+          envkey_DBNAME: ${{ secrets.TEST_DBNAME }}
+          envkey_DOMAIN: ${{ secrets.TEST_DOMAIN }}
+          envkey_PUBKEY: ${{ secrets.TEST_PUBKEY }}
+          envkey_PRIKEY: ${{ secrets.TEST_PRIKEY }}
+          file_name: .env
+          directory: ./api/src/config/
       # -
       #   name: create-json (LATEST)
       #   if: github.ref_name == 'latest'
