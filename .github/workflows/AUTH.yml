@@ -24,14 +24,6 @@ jobs:
       -
         name: Checkout repository
         uses: actions/checkout@v3
-      # - 
-      #   name: Create .env file
-      #   if: github.ref_name == 'latest'
-      #   run: echo "${{ secrets.PROD_AUTH_VAR }}" > ./auth/.env
-      # - 
-      #   name: Create .env file
-      #   if: github.ref_name == 'testing'
-      #   run: echo "${{ secrets.TEST_AUTH_VAR }}" > ./auth/.env
       -
         name: Make ENVFILE (LATEST)
         if: github.ref_name == 'latest'
