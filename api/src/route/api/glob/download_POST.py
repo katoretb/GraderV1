@@ -120,7 +120,7 @@ def main():
             lab 
             LEFT JOIN class ON class.CSYID = lab.CSYID
         WHERE 
-            LID = 17
+            LID = %s
         """
         cur.execute(select_query, (data[0][1],))
         resultLab = cur.fetchone()
@@ -134,7 +134,7 @@ def main():
     if FRL[0] == 1:
         prefilename = os.path.split(data[0][0])[-1].split("_")
         if FRL[1] == 0:
-            if not editBefore:
+            if editBefore:
                 filename = f'{Email.split("@")[0]}-L{resultLab[0]}-Q{int(prefilename[1]) + 1}.ipynb'
             else:
                 filename = f'Release_{str(resultLab[1]).replace(".", "-")}_L{resultLab[0]}_Q{int(prefilename[1]) + 1}.ipynb'
