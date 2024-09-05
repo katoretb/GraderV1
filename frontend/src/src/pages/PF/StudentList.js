@@ -141,6 +141,29 @@ function StudentList() {
       // Display an error message to the user
     }
   };
+
+  const handleExportSepQ = async () => {
+    try {
+      const response = await fetch(`${host}/TA/Student/List/CSVQ?CSYID=${classId}`, {
+        method: 'GET',
+        credentials: "include",
+        headers: {
+            "X-CSRF-TOKEN": Cookies.get("csrf_token")
+        },
+      })
+      const data = await response.json();
+      
+      const url = window.URL.createObjectURL(new Blob([data["data"]["csv"]], { type: 'text/csv' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', data["data"]["filename"]);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error exporting data:', error);
+    }
+  };
   
 
   const handleSearch = (e) => {
@@ -319,9 +342,10 @@ function StudentList() {
                 <button style={{marginLeft: "1.5rem"}} className="btn btn-outline-success" type="button" id="button-addon2" onClick={() => handleAddStudent()} >+ Add</button>
               </ul>
             </div>
-            <div className="col-md-2">
+            <div className="col-md-4">
               <button className="btn btn-primary float-end" type="button" style={{marginLeft:"20px"}} onClick={() => navigate("/")}>Back</button>
               <button className="btn btn-secondary float-end" type="button" style={{ marginLeft: '20px' }} onClick={handleExport}>Export</button>
+              <button className="btn btn-secondary float-end" type="button" style={{ marginLeft: '20px' }} onClick={handleExportSepQ}>Export questions</button>
             </div>
           </div>
         </div>

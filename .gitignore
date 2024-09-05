@@ -37,3 +37,4 @@ test.py
 .DS_Store
 client_secrets.json
 scvrb.txt
+pjconfig/
