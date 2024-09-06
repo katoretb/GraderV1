@@ -3,6 +3,23 @@ import json
 from io import StringIO
 from contextlib import redirect_stdout
 import stopit
+import ast
+
+
+def __remove_function_calls(code):
+    tree = ast.parse(code)
+    new_code = []
+
+    for node in tree.body:
+        # Check if the node is a function definition
+        if isinstance(node, ast.FunctionDef):
+            func_start = node.lineno - 1
+            func_end = node.body[-1].lineno
+            new_code.append(code.splitlines()[func_start:func_end])
+
+    # Flatten the list of lists
+    return '\n'.join([line for func in new_code for line in func])
+
 
 def __filter_escapes(string):
     string = (
@@ -111,7 +128,13 @@ def grade(Question, submit, addfile=[], validate=True, timeout=20, check_keyword
             if(protectWrite):
                 if ".write(" in TempSol: return True, "This file contain file write method it may broke the additional assignment files"
             
-            solution.append("".join(TempSol.split(temporarySplitWord)))         
+            # join solution
+            sol = "".join(TempSol.split(temporarySplitWord))
+
+            # filter function call
+            sol = __remove_function_calls(sol)
+
+            solution.append(sol)         
 
     if Qinfo is None:
         Qinfo = QinfoGenerate(Question, addfile)
