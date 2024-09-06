@@ -28,12 +28,12 @@ def main():
             GROUP_CONCAT(
                 DISTINCT 
                 CONCAT(
-                    'MAX(CASE 
-                        WHEN LB.LID = ', QST.LID, 
-                        ' AND QST.QID = ', QST.QID, 
-                        ' THEN SMT.Score ELSE 0 END) AS `Score_L', LB.Lab, '_Q', QST.QID, '`'
+                    'ROUND(MAX(CASE 
+                        WHEN SMT.LID = ', QST.LID, 
+                        ' AND SMT.QID = ', QST.QID, 
+                        ' THEN SMT.Score ELSE 0 END), 2) AS `Score_L', LB.Lab, '_Q', QST.QID, '`'
                 )
-            ) AS dynamic_columns
+            ) AS Dynamic_col
         FROM 
             question QST
             JOIN lab LB ON QST.LID = LB.LID
@@ -49,7 +49,7 @@ def main():
             STD.UID AS `ID`,
             USR.Name AS `Name (English)`,
             SCT.Section AS `Section`,
-            COALESCE(GRP.Group, '-') AS `Group`, {dynamic_columns}
+            COALESCE(GRP.Group, \'-\') AS `Group`, {dynamic_columns}
         FROM 
             student STD
             LEFT JOIN user USR ON USR.UID = STD.UID
