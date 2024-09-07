@@ -119,7 +119,7 @@ def main():
 
 
                 connection.commit()
-                return jsonify({'success': True, 'msg': 'CSV processed successfully'})
+                return jsonify({'success': True, 'msg': 'CSV processed'})
     except Exception as e:
         connection.rollback()
         return jsonify({'success': False, 'msg': str(e)})

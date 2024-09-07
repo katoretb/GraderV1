@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/Navbar'
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { FileEarmark, Download } from 'react-bootstrap-icons';
+import { FileEarmark, Download, Trash } from 'react-bootstrap-icons';
 
 const host = `${process.env.REACT_APP_HOST}`
 
@@ -33,6 +33,43 @@ function AssignEdit() {
   const [isGroup, setIsGroup] = useState(false)
   const [SelectList, setSelectList] = useState([]);
   const [Selected, setSelected] = useState([]);
+
+  const fetchLab = async () => {
+    try {
+      const response = await fetch(`${host}/TA/class/Assign/data?LID=${LID}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-type": "application/json; charset=UTF-8",
+            "Access-Control-Allow-Origin": "*",
+            "X-CSRF-TOKEN": Cookies.get("csrf_token")
+        }
+      });
+      const data = await response.json();
+      if(data.success){
+        setLabNum(data.data.LabNum)
+        setLabName(data.data.LabName)
+
+        setPublishDate(data.data.PubDate)
+        setDueDate(data.data.DueDate)
+        setDueDateLock(data.data.LOD)
+        setShowLock(data.data.ShowOnLock)
+
+        setIsGroup(data.data.IsGroup)
+        setSelectList(data.data.SelectList)
+        setSelected(data.data.Selected)
+
+        setTotalQNum(data.data.Question.length)
+        setScores(data.data.Question)
+        console.log(data.data.addfile)
+        setAddfiles(data.data.addfile)
+      }else{
+        throw Error(data.msg)
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchLab = async () => {
@@ -62,6 +99,7 @@ function AssignEdit() {
   
           setTotalQNum(data.data.Question.length)
           setScores(data.data.Question)
+          console.log(data.data.addfile)
           setAddfiles(data.data.addfile)
         }else{
           throw Error(data.msg)
@@ -218,7 +256,7 @@ function AssignEdit() {
 
             if (Data.success){
               withReactContent(Swal).fire({
-                  title: "Assignment edited successfully",
+                  title: "Assignment edited",
                   icon: "success"
               }).then(ok => {
                   if(ok)
@@ -286,7 +324,7 @@ function AssignEdit() {
 
             if (Data.success){
               withReactContent(Swal).fire({
-                  title: "Assignment deleted successfully",
+                  title: "Assignment deleted",
                   icon: "success"
               }).then(ok => {
                   if(ok)
@@ -347,6 +385,37 @@ function AssignEdit() {
 
           // Clean up by revoking the object URL
           window.URL.revokeObjectURL(url);
+        }else{
+          withReactContent(Swal).fire({
+            title: data.msg,
+            icon: "error"
+          })
+        }
+    })
+    .catch(error => console.error('Error:', error));
+  }
+
+  const delfile = async (i) => {
+    fetch(`${process.env.REACT_APP_HOST}/TA/class/Assign/delfile`, {
+        method: 'POST',
+        credentials: "include",
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            "X-CSRF-TOKEN": await Cookies.get("csrf_token")
+        },
+        body: JSON.stringify({ 
+          fileRequest: `${i}`,
+          CSYID: classId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success){
+          fetchLab()
+          withReactContent(Swal).fire({
+            title: "File deleted",
+            icon: "success"
+          })
         }else{
           withReactContent(Swal).fire({
             title: data.msg,
@@ -495,7 +564,31 @@ function AssignEdit() {
                   </div>
                   <div className='card-body'>
                     {addfiles.map((a, i) => {
-                      return <button key={`AD${i}`} type="button" className="btn btn-outline-dark" style={{width: "100%", textAlign: "Left", marginBottom: "0.5em"}} onClick={() => {downfile(0, 0, a)}}><span style={{color: "rgb(255, 178, 62)"}}><FileEarmark /></span> Essential file: {i+1}</button>
+                      return <div className='row'>
+                        <div key={`AD${i}`}  className='col' style={{paddingRight: "0px"}}>
+                          <button 
+                            type="button" 
+                            className="btn btn-outline-dark" 
+                            style={{width: "100%", textAlign: "Left", marginBottom: "0.5em"}} 
+                            onClick={() => {downfile(0, 0, a[0])}}
+                          >
+                            <span style={{color: "rgb(255, 178, 62)"}}>
+                              <FileEarmark />
+                            </span>
+                             Essential file {i+1}: {a[1]}
+                          </button>
+                        </div>
+                        <div className='col-1' style={{paddingLeft: "0px"}}>
+                        <button
+                            type="button" 
+                            className="btn btn-outline-danger" 
+                            style={{width: "100%", textAlign: "Left", marginBottom: "0.5em"}} 
+                            onClick={() => {delfile(a[0])}}
+                          >
+                            <span style={{color: "rgb(174, 8, 8)"}}><Trash /></span>
+                          </button>
+                        </div>
+                      </div>
                     })}
                   </div>
                 </div>

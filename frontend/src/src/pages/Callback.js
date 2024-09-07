@@ -37,7 +37,7 @@ function Callback() {
                 Cookies.set("role", data["data"]["role"])
 
                 withReactContent(Swal).fire({
-                    title: "Login successfully!",
+                    title: "Login!",
                     icon: "success"
                 }).then(ok => {
                     if(ok)
