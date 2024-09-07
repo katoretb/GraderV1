@@ -71,7 +71,7 @@ def main():
 
         return jsonify({
             'success': True,
-            'msg': "Student edited successfully.",
+            'msg': "Student edited.",
             'data': {}
         })
 

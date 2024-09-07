@@ -230,7 +230,7 @@ function AssignCreate() {
 
           if (Data.success){
             withReactContent(Swal).fire({
-                title: "Assignment created successfully",
+                title: "Assignment created",
                 icon: "success"
             }).then(ok => {
                 if(ok)

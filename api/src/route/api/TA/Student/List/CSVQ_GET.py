@@ -33,7 +33,7 @@ def main():
                         ' AND SMT.QID = ', QST.QID, 
                         ' THEN SMT.Score ELSE 0 END), 2) AS `Score_L', LB.Lab, '_Q', QST.QID, '`'
                 )
-            ) AS Dynamic_col
+            ) AS dynamic_column
         FROM 
             question QST
             JOIN lab LB ON QST.LID = LB.LID
@@ -77,6 +77,9 @@ def main():
     SELECT CONCAT(
             'Score_L', 
             lab.Lab, 
+            '(', 
+            lab.LID, 
+            ')',
             '_Q', 
             ROW_NUMBER() OVER (PARTITION BY lab.LID ORDER BY question.QID), 
             '(', 
@@ -91,10 +94,14 @@ def main():
     cur.execute(qr, (CSYID))
     dyna_colum = cur.fetchall()
 
-
     fieldnames = ['ID', 'Name (English)', 'Section', 'Group'] + [i[0] for i in dyna_colum]
-
-    CSV_data = [{fieldnames[j]:i[j] for j in range(len(i))} for i in ListResult]
+    CSV_data = []
+    # CSV_data = [{fieldnames[j]:i[j] for j in range(len(i))} for i in ListResult]
+    for i in ListResult:
+        tempdata = {}
+        for j in range(len(i)):
+            tempdata[fieldnames[j]] = i[j]
+        CSV_data.append(tempdata)
 
     temp_output = StringIO()
     

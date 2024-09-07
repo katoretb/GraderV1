@@ -1,5 +1,6 @@
 from function.db import get_db
 from flask import request, jsonify
+import os
 
 from function.isLock import isLock
 from function.isCET import isCET
@@ -113,7 +114,8 @@ def main():
         # Retrieve addfile details
         query = """
             SELECT
-                AF.ID
+                AF.ID,
+                AF.Path
             FROM
                 addfile AF
             WHERE
@@ -137,7 +139,7 @@ def main():
                 "Selected": [PreSelectList[int(i)] for i in [i for i in newD5.strip("[] ").split(",")]],
                 "SelectList": list(PreSelectList.values()),
                 "Question": [{"id": i+1, "QID": questions[i][0], "score": int(questions[i][1])} for i in range(len(questions))],
-                "addfile": [file[0] for file in addfiles]
+                "addfile": [[file[0], os.path.basename(file[1])] for file in addfiles]
             }
         }), 200
     

@@ -124,7 +124,7 @@ function HomePF() {
         fetchCourses();
         handleCancel()
         withReactContent(Swal).fire({
-            title: "Class created successfully",
+            title: "Class created",
             icon: "success"
         })
       }else{
