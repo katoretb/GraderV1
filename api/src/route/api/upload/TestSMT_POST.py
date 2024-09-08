@@ -313,7 +313,7 @@ def main():
 
         return jsonify({
             'success': True,
-            'msg': "Record inserted successfully",
+            'msg': "Record inserted",
             'data': {}
         }), 200
 

@@ -35,7 +35,7 @@ def main():
             """
         cursor.execute(update_class, (ClassName, ClassID, SchoolYear, CSYID))
         conn.commit()
-        return jsonify({"message":"class update successfully","Status": True})
+        return jsonify({"message":"class update","Status": True})
     except mysql.connector.Error as error:
         conn.rollback()
         return jsonify({"message":"An error occurred while delete class.","Status": False})

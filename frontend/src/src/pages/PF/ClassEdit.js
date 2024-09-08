@@ -99,7 +99,7 @@ function ClassEdit() {
                     const responseData = await response.json();
                     if (responseData.Status){
                         withReactContent(Swal).fire({
-                            title: "Infomation updated successfully",
+                            title: "Infomation updated",
                             icon: "success"
                         }).then(ok => {
                             if(ok)
@@ -158,7 +158,7 @@ function ClassEdit() {
                 
                 if (responseData["success"]){
                     withReactContent(Swal).fire({
-                        title: "Thumbnail uploaded successfully",
+                        title: "Thumbnail uploaded",
                         icon: "success"
                     }).then(ok => {
                         if(ok)
@@ -215,7 +215,7 @@ function ClassEdit() {
                 withReactContent(Swal).close()
                 if (responseData["success"]){
                     withReactContent(Swal).fire({
-                        title: "CSV uploaded successfully",
+                        title: "CSV uploaded",
                         icon: "success"
                     })
                 }else{
@@ -271,7 +271,7 @@ function ClassEdit() {
     //                 const responseData = await response.json();
     //                 if (responseData.Status){
     //                     withReactContent(Swal).fire({
-    //                         title: "Class Deleted successfully",
+    //                         title: "Class Deleted",
     //                         icon: "success"
     //                     }).then(ok => {
     //                         if(ok)

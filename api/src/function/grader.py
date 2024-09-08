@@ -4,6 +4,7 @@ from io import StringIO
 from contextlib import redirect_stdout
 import stopit
 
+
 def __filter_escapes(string):
     string = (
     string
@@ -111,6 +112,7 @@ def grade(Question, submit, addfile=[], validate=True, timeout=20, check_keyword
             if(protectWrite):
                 if ".write(" in TempSol: return True, "This file contain file write method it may broke the additional assignment files"
             
+            # join solution
             solution.append("".join(TempSol.split(temporarySplitWord)))         
 
     if Qinfo is None:

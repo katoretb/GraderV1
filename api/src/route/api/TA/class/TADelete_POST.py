@@ -86,6 +86,6 @@ def main():
     
     return jsonify({
             'success': True,
-            'msg': 'TA deleted successfully.',
+            'msg': 'TA deleted.',
             'data': ''
         })

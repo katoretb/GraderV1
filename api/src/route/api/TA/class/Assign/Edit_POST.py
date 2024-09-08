@@ -233,15 +233,16 @@ def main():
         for i in data:
             os.remove(i[0])
 
-        query = """
-        DELETE
-        FROM 
-            addfile ADF
-        WHERE 
-            ADF.LID = %s
-        """
-        cursor.execute(query, (LID))
-        conn.commit()
+        if len(Additional_files) > 0:
+            query = """
+            DELETE
+            FROM 
+                addfile ADF
+            WHERE 
+                ADF.LID = %s
+            """
+            cursor.execute(query, (LID))
+            conn.commit()
 
 
         for i in Additional_files:
