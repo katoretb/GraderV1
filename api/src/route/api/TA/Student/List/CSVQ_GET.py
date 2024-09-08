@@ -103,7 +103,7 @@ def main():
         SCT.Section AS `Section`,
         COALESCE(GRP.Group, '-') AS `Group`,
         CONCAT(SMT.LID, '_', SMT.QID) AS LQID, 
-        ROUND(COALESCE(Score, 0)) AS Score
+        ROUND(COALESCE(Score, 0), 2) AS Score
     FROM 
         student STD
         LEFT JOIN user USR ON USR.UID = STD.UID
