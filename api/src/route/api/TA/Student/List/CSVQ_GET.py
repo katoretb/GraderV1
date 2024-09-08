@@ -23,52 +23,52 @@ def main():
             'data': {}
         }), 200
 
-    query_generate_columns = """
-        SELECT
-            GROUP_CONCAT(
-                DISTINCT 
-                CONCAT(
-                    'ROUND(MAX(CASE 
-                        WHEN SMT.LID = ', QST.LID, 
-                        ' AND SMT.QID = ', QST.QID, 
-                        ' THEN SMT.Score ELSE 0 END), 2) AS `Score_L', LB.Lab, '_Q', QST.QID, '`'
-                )
-            ) AS dynamic_column
-        FROM 
-            question QST
-            JOIN lab LB ON QST.LID = LB.LID
-        WHERE 
-            QST.CSYID = %s;
-    """
-    cur.execute(query_generate_columns, (CSYID))
+    # query_generate_columns = """
+    #     SELECT
+    #         GROUP_CONCAT(
+    #             DISTINCT 
+    #             CONCAT(
+    #                 'ROUND(MAX(CASE 
+    #                     WHEN SMT.LID = ', QST.LID, 
+    #                     ' AND SMT.QID = ', QST.QID, 
+    #                     ' THEN SMT.Score ELSE 0 END), 2) AS `Score_L', LB.Lab, '_Q', QST.QID, '`'
+    #             )
+    #         ) AS dynamic_column
+    #     FROM 
+    #         question QST
+    #         JOIN lab LB ON QST.LID = LB.LID
+    #     WHERE 
+    #         QST.CSYID = %s;
+    # """
+    # cur.execute(query_generate_columns, (CSYID))
 
-    dynamic_columns = cur.fetchone()[0]
+    # dynamic_columns = cur.fetchone()[0]
 
-    query_dynamic_sql = f"""
-        SELECT 
-            STD.UID AS `ID`,
-            USR.Name AS `Name (English)`,
-            SCT.Section AS `Section`,
-            COALESCE(GRP.Group, \'-\') AS `Group`, {dynamic_columns}
-        FROM 
-            student STD
-            LEFT JOIN user USR ON USR.UID = STD.UID
-            LEFT JOIN submitted SMT ON SMT.UID = STD.UID AND SMT.CSYID = STD.CSYID
-            LEFT JOIN lab LB ON SMT.LID = LB.LID
-            INNER JOIN section SCT ON STD.CSYID = SCT.CSYID AND SCT.CID = STD.CID
-            LEFT JOIN `group` GRP ON GRP.GID = STD.GID
-            LEFT JOIN question QST ON QST.LID = LB.LID
-        WHERE
-            STD.CSYID = %s
-        GROUP BY 
-            STD.UID, USR.Name, SCT.Section, GRP.Group
-        ORDER BY
-            Section ASC, ID ASC;
-    """
+    # query_dynamic_sql = f"""
+    #     SELECT 
+    #         STD.UID AS `ID`,
+    #         USR.Name AS `Name (English)`,
+    #         SCT.Section AS `Section`,
+    #         COALESCE(GRP.Group, \'-\') AS `Group`, {dynamic_columns}
+    #     FROM 
+    #         student STD
+    #         LEFT JOIN user USR ON USR.UID = STD.UID
+    #         LEFT JOIN submitted SMT ON SMT.UID = STD.UID AND SMT.CSYID = STD.CSYID
+    #         LEFT JOIN lab LB ON SMT.LID = LB.LID
+    #         INNER JOIN section SCT ON STD.CSYID = SCT.CSYID AND SCT.CID = STD.CID
+    #         LEFT JOIN `group` GRP ON GRP.GID = STD.GID
+    #         LEFT JOIN question QST ON QST.LID = LB.LID
+    #     WHERE
+    #         STD.CSYID = %s
+    #     GROUP BY 
+    #         STD.UID, USR.Name, SCT.Section, GRP.Group
+    #     ORDER BY
+    #         Section ASC, ID ASC;
+    # """
 
-    cur.execute(query_dynamic_sql, (CSYID))
+    # cur.execute(query_dynamic_sql, (CSYID))
 
-    ListResult = cur.fetchall()
+    # ListResult = cur.fetchall()
 
     ClassID, SchoolYear = GetClassSchoolyear(conn, cur, CSYID) 
     
@@ -85,7 +85,8 @@ def main():
             '(', 
             question.MaxScore, 
             ')'
-        ) AS Name
+        ) AS Name,
+        CONCAT(question.LID, '_', question.QID) AS LQID
     FROM question
     JOIN lab ON question.LID = lab.LID
     WHERE lab.CSYID = %s
@@ -93,6 +94,54 @@ def main():
     """
     cur.execute(qr, (CSYID))
     dyna_colum = cur.fetchall()
+
+    
+    qr = """
+    SELECT 
+        STD.UID,
+        USR.Name,
+        SCT.Section AS `Section`,
+        COALESCE(GRP.Group, '-') AS `Group`,
+        CONCAT(SMT.LID, '_', SMT.QID) AS LQID, 
+        ROUND(COALESCE(Score, 0)) AS Score
+    FROM 
+        student STD
+        LEFT JOIN user USR ON USR.UID = STD.UID
+        LEFT JOIN submitted SMT on STD.UID = SMT.UID AND STD.CSYID = SMT.CSYID
+        INNER JOIN section SCT ON STD.CSYID = SCT.CSYID AND SCT.CID = STD.CID
+        LEFT JOIN `group` GRP ON GRP.GID = STD.GID
+    WHERE 
+        STD.CSYID = %s
+    ORDER BY 
+        CAST(STD.UID AS UNSIGNED) ASC, 
+        CAST(SMT.LID AS UNSIGNED) ASC, 
+        CAST(SMT.QID AS UNSIGNED) ASC;
+    """
+
+    cur.execute(qr, (CSYID))
+
+
+    subm_dt = cur.fetchall()
+
+    ListResult = []
+    dnmc_length = len(dyna_colum)
+    LQID_map = {str(dyna_colum[i][1]):i+4 for i in range(dnmc_length)}
+
+    current_UID = ""
+    temp_dt = []
+    for i in subm_dt:
+        if i[0] != current_UID:
+            if len(temp_dt) != 0:
+                ListResult.append(temp_dt)
+            current_UID = i[0]
+            temp_dt = [0] * (dnmc_length+4)
+            temp_dt[0] = i[0]
+            temp_dt[1] = i[1]
+            temp_dt[2] = i[2]
+            temp_dt[3] = i[3]
+        if i[4] in LQID_map:
+            temp_dt[LQID_map[str(i[4])]] = i[5]
+    ListResult.append(temp_dt)
 
     fieldnames = ['ID', 'Name (English)', 'Section', 'Group'] + [i[0] for i in dyna_colum]
     CSV_data = []
