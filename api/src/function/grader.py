@@ -80,7 +80,14 @@ def QinfoGenerate(Question, addfile=[]) -> dict:
                     afname = afpath.split("/")[-1]
                     temporaryTestcase = temporaryTestcase.replace(afname, afpath)
 
-            template["Testcase"].append(temporaryTestcase.strip(temporarySplitWord).split(temporarySplitWord))
+            tempararyTSCL = temporaryTestcase.split(temporarySplitWord)
+            if len(tempararyTSCL) != 0:
+                if tempararyTSCL[0] == "":
+                    tempararyTSCL = tempararyTSCL[1:]
+                if tempararyTSCL[-1] == "":
+                    tempararyTSCL = tempararyTSCL[:-1]
+                
+            template["Testcase"].append(tempararyTSCL)
             temporaryTestcase = ""
             isPeriod = not isPeriod
 
