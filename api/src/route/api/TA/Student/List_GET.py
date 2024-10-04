@@ -20,7 +20,7 @@ def main():
 
     # Query to get the list of students and their scores
     StudentList_query = """
-    SELECT 
+    SELECT
         STD.UID AS `ID`,
         USR.Name AS `Name (English)`,
         SCT.Section AS `Section`,

@@ -169,6 +169,44 @@ function Lab() {
       })
     }
   }
+
+  const tiketQR = async (Type) => {
+    try{
+      const response = await fetch(`${host}/ST/assignment/ticket?LID=${LID}&CSYID=${classId}&Type=${Type}`, {
+        method: 'GET',
+        credentials: "include",
+        headers: {
+            "X-CSRF-TOKEN": Cookies.get("csrf_token")
+        }
+      })
+      const Data = await response.json()
+      if (Data.success){
+        withReactContent(Swal).fire({
+            title: Type === 0 ? "Request to leave" : "Request to enter",
+            // text: Data['data']['msg'],
+            // icon: "success"
+            html: `
+              <img src="${Data['data']['qr']}">
+              <a style="color:rgb(160, 160, 160)">${Data['data']['ID']}</a><br/>
+              <a><b>Student ID:</b> ${Email.split("@")[0]}</a>
+            `,
+            showCloseButton: true,
+            showConfirmButton: false,
+        });
+      }else{
+        withReactContent(Swal).fire({
+          title: Data.msg,
+          icon: Data.data
+        })
+      }
+    }catch (error) {
+      withReactContent(Swal).fire({
+          title: "Please contact admin!",
+          text: error,
+          icon: "error"
+      })
+    }
+  }
   
   return (
     <div>
@@ -191,8 +229,14 @@ function Lab() {
             <div className="col">
               <h5>Assignment</h5>
             </div>
-            <div className="col-md-2">
-              <button type="button" className="btn btn-primary float-end" onClick={() => navigate("/Class")}>Back</button>
+            <div className="col-md-3">
+              <button type="button" className="btn btn-primary float-end" style={{marginLeft:"20px"}} onClick={() => navigate("/Class")}>Back</button>
+              {LabInfo && LabInfo.Info["Exam"] ? 
+                LabInfo.Info["Access"] ? 
+                <button type="button" className="btn btn-info float-end" onClick={() => tiketQR(0)}>Request to leave</button> 
+                :
+                <button type="button" className="btn btn-info float-end" onClick={() => tiketQR(1)}>Request to enter</button>
+              :""}
             </div>
           </div>
         </div>
@@ -226,6 +270,7 @@ function Lab() {
                 </div>
               </div>
               <br/>
+              {LabInfo.Info["Access"] ? (
               <div className='card'>
                 <div className='card-header'>
                   <h5><Download /> Downlaod files</h5>
@@ -239,6 +284,7 @@ function Lab() {
                   })}
                 </div>
               </div>
+              ) : ("")}
             </div>
             <div className='col'>
               {LabInfo.Question.map((q, i) => {
@@ -254,6 +300,7 @@ function Lab() {
                     </div>
                   </div>
                   <div className='card-body'>
+                    {LabInfo.Info["Access"] ? (
                     <div className='row'>
                       <div className='col'>
                         <div className="input-group">
@@ -264,6 +311,7 @@ function Lab() {
                         <button className="btn btn-primary float-end" type="button" id={`Q${q.QID}`} onClick={() => {submit(q.QID, i+1)}} disabled={LabInfo.Info["Lock"]}>Submit</button>
                       </div>
                     </div>
+                    ):("")}
                     <br/>
                     <div className='row'>
                       <div className='col'>
@@ -273,7 +321,7 @@ function Lab() {
                             ("-") : (
                               <span>
                                 {q.SMT.Filename} <span style={{color: "rgb(91, 91, 91)", fontSize: "0.8rem"}}>{q.SMT.Date}</span>
-                                <button type="button" className="btn btn-outline-dark" style={{width: "auto", textAlign: "Left", marginLeft: "0.5em"}} onClick={() => {downfile(2, q.SMT.SID)}}><Download /> Download</button>
+                                {LabInfo.Info["Access"] ? (<button type="button" className="btn btn-outline-dark" style={{width: "auto", textAlign: "Left", marginLeft: "0.5em"}} onClick={() => {downfile(2, q.SMT.SID)}}><Download /> Download</button>):("")}
                                 <br/><span style={{color: "rgb(101, 101, 101)",fontSize: "1 rem"}}>{'('}<b>Original</b>: {q.SMT.OriginalName}{')'}</span>
                               </span>
                           )}

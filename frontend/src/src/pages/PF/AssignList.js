@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/Navbar'
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { QrCodeScan } from 'react-bootstrap-icons';
 
 const host = `${process.env.REACT_APP_HOST}`
 
@@ -20,6 +21,11 @@ function AssignList() {
   const [isButtonClicked, setIsButtonClicked] = useState(false);
 
   useEffect(() => {
+    document.body.style.backgroundColor = "#FFF"
+    if(!classId){
+      navigate("/")
+    }
+
     const fetchData = async () => {
       try {
         const response = await fetch(`${host}/TA/class/Assign?CSYID=${classId}`, {
@@ -97,31 +103,28 @@ function AssignList() {
 
       <br></br>
       {ClassInfo && (
-      <div className="media d-flex align-items-center">
-        <span style={{ margin: '0 10px' }}></span>
-        <img className="mr-3" alt="thumbnail" src={ClassInfo['Thumbnail'] ? `${host}/Thumbnail/` + ClassInfo['Thumbnail'] : "https://cdn-icons-png.flaticon.com/512/3426/3426653.png"} style={{ width: '40px', height: '40px' }} />
-        <span style={{ margin: '0 10px' }}></span>
-        <div className="card" style={{ width: '30rem', padding: '10px' }}>
-          <h5>{ClassInfo['ClassID']} {ClassInfo['ClassName']} {ClassInfo['ClassYear']}</h5>
-          <h6>Instructor: {ClassInfo['Instructor']}</h6>
+      <div className='row' style={{width: "100vw"}}>
+        <div className='col'>
+          <div className="media d-flex align-items-center">
+            <span style={{ margin: '0 10px' }}></span>
+            <img className="mr-3" alt="thumbnail" src={ClassInfo['Thumbnail'] ? `${host}/Thumbnail/` + ClassInfo['Thumbnail'] : "https://cdn-icons-png.flaticon.com/512/3426/3426653.png"} style={{ width: '40px', height: '40px' }} />
+            <span style={{ margin: '0 10px' }}></span>
+            <div className="card" style={{ width: 'auto', padding: '10px' }}>
+              <h5>{ClassInfo['ClassID']} {ClassInfo['ClassName']} {ClassInfo['ClassYear']}</h5>
+              <h6>Instructor: {ClassInfo['Instructor']}</h6>
+            </div>
+          </div>
         </div>
-          {/* <button type="button" className="btn btn-secondary" onClick={() => navigate("/StudentList")} style={{ marginLeft: 40 + 'em' }}>Student lists</button> */}
+        <div className='col-3' style={{padding: "0"}}>
+              <button type="button" className="btn btn-secondary" onClick={() => navigate("/Scan")}><QrCodeScan /> Scan</button>
+        </div>
       </div>
       )}
 
       <br></br>
-      <div className="card" style={{ marginLeft: 10 + 'em', marginRight: 10 + 'em' }}>
+      {/* <div className="card" style={{ marginLeft: 10 + 'em', marginRight: 10 + 'em' }}> */}
+      <div className="card" style={{ marginLeft: 10 + 'vw', marginRight: 10 + 'vw' }}>
         <div className="card-header">
-          {/* <div className="row" style={{marginBottom:"-5px"}}>
-              <div className="col">
-                <h5 style={{ display: 'inline-block' }}>Assignments</h5>
-                <span style={{ margin: '0 10px' }}></span>
-                <button className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={() => navigate("/AssignCreate")} >+ New</button>
-              </div>
-              <div className="col-md-1">
-                <button type="button" onClick={() => navigate("/")} className="btn btn-primary float-end">Back</button>
-              </div>
-          </div> */}
           <div className="row" style={{marginBottom:"-5px"}}>
             <div className="col">
               <ul className="nav nav-tabs card-header-tabs">
@@ -131,15 +134,16 @@ function AssignList() {
                 <li className="nav-item">
                   <button className="nav-link link" onClick={() => navigate("/StudentList")} >Student List</button>
                 </li>
-                <button style={{marginLeft: "1.5rem"}} className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={() => navigate("/AssignCreate")} >+ New</button>
+                {/* <button style={{marginLeft: "1.5rem"}} className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={() => navigate("/AssignCreate")} >+ New</button> */}
               </ul>
             </div>
-            <div className="col-md-2">
+            <div className="col-md">
               <button className="btn btn-primary float-end" type="button" style={{marginLeft:"20px"}} onClick={() => navigate("/")}>Back</button>
             </div>
           </div>
         </div>
         <div className="card-body" style={{ overflowY: 'scroll' }}>
+          <button style={{marginLeft: "1.5rem", marginBottom: "1rem"}} className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={() => navigate("/AssignCreate")} >+ New</button>
           <div>
             {assignmentsData && ((assignmentsData.length !== 0) && (
               assignmentsData.map(assign => {

@@ -139,7 +139,7 @@ def main():
         CSYID = result[2]
         Source = result[3]
         MaxScore = result[4]
-        Qinfo = None if result[6] == None else json.loads(result[6])
+        Qinfo = None if result[6] is None else json.loads(result[6])
 
         # Query to select additional files (addfile) paths related to LID
         select_query = "SELECT Path FROM addfile WHERE LID = %s"
@@ -268,6 +268,20 @@ def main():
             cursor.execute(sus_query, (UID, LID, QID, 5, "There is problem with signature.", upload_time))
             conn.commit()
             
+        upsert_query = """
+            INSERT INTO submitted (UID, LID, QID, SummitedFile, Score, Timestamp, CSYID, OriginalName)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                SummitedFile = VALUES(SummitedFile),
+                Score = VALUES(Score),
+                Timestamp = VALUES(Timestamp),
+                OriginalName = VALUES(OriginalName)
+        """
+
+        # Execute the query with the provided values
+        cursor.execute(upsert_query, (UID, LID, QID, filepath, None, upload_time, CSYID, OriginalFileName))
+        conn.commit()
+        
         executor.submit(gradeInBackground, Source, addfiles, filepath, QID, MaxScore, UID, LID, upload_time, CSYID, OriginalFileName, Qinfo)
 
         return jsonify({

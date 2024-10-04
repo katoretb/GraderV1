@@ -53,7 +53,7 @@ def QinfoGenerate(Question, addfile=[]) -> dict:
 
     # Tester
     for i in range(len(ScodeCell)):
-        if (ScodeCell[i]["metadata"]["nbgrader"]["solution"] == False) and (ScodeCell[i]["metadata"]["nbgrader"].get("points") == None) and "mock_stdout.getvalue()" in "".join(ScodeCell[i]["source"]):
+        if (ScodeCell[i]["metadata"]["nbgrader"]["solution"] == False) and (ScodeCell[i]["metadata"]["nbgrader"].get("points") is None) and "mock_stdout.getvalue()" in "".join(ScodeCell[i]["source"]):
             template["TesterLoc"] = i
             template["Tester"] = "".join(ScodeCell[i]["source"])
         

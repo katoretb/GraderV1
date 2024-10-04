@@ -26,15 +26,15 @@ def main():
     cursor.execute(query, (LID,))
     data = cursor.fetchone()
     
-    if data == None:
-        jsonify({
+    if data is None:
+        return jsonify({
             'success': False,
             'msg': "Lab not found",
             'data': {}
         }), 200
 
     if not isCET(conn, cursor, Email, data[0]):
-        jsonify({
+        return jsonify({
             'success': False,
             'msg': "You don't have permission.",
             'data': {}
@@ -55,7 +55,8 @@ def main():
                     WHEN LB.Due = LB.Lock THEN 1
                     ELSE 0
                 END AS LOD,
-                LB.showScoreOnLock
+                LB.showScoreOnLock,
+                LB.Exam
             FROM
                 lab LB
             WHERE 
@@ -135,6 +136,7 @@ def main():
                 "LOD": bool(data[7]),
                 "Lock": isLock(conn, cursor, LID),
                 "ShowOnLock": bool(int(data[8])),
+                "isExam": bool(int(data[9])),
                 "IsGroup": isGroup,
                 "Selected": [PreSelectList[int(i)] for i in [i for i in newD5.strip("[] ").split(",")]],
                 "SelectList": list(PreSelectList.values()),
