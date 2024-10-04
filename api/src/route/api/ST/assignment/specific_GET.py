@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import request, jsonify, g
 
 from function.isLock import isLock
+from function.isAccess import isAccess
 
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -54,7 +55,8 @@ def main():
                 CASE 
                     WHEN l.Due <= IFNULL(s.LatestTimestamp, CONVERT_TZ(NOW(), '+00:00', '+07:00')) THEN 1
                     ELSE 0
-                END AS Late
+                END AS Late, 
+                Exam
             FROM lab l
             LEFT JOIN (
                 SELECT LID, MAX(Timestamp) AS LatestTimestamp
@@ -73,8 +75,11 @@ def main():
             "Name": lab_info_row[1],
             "Publish": datetime.strptime(str(lab_info_row[2]), "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M"),
             "Due": datetime.strptime(str(lab_info_row[3]), "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M"),
-            "Late": bool(int(lab_info_row[4]))
+            "Late": bool(int(lab_info_row[4])),
+            "Access": isAccess(g.db, cur, Email=Email, LID=LID),
+            "Exam": lab_info_row[5]
         }
+
 
         # Fetch questions and submission information
         cur.execute("""
@@ -106,6 +111,7 @@ def main():
             late = 1 if timestamp and datetime.strptime(timestamp, "%d/%m/%Y %H:%M") > datetime.strptime(lab_info["Due"], "%d/%m/%Y %H:%M") else 0
             if not timestamp:
                 late = -1
+                
             questions_list.append({
                 "QID": q[0],
                 "SMT": {

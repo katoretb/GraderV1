@@ -27,15 +27,15 @@ def main():
         cursor.execute(query, (LID,))
         data = cursor.fetchone()
 
-        if data == None:
-            jsonify({
+        if data is None:
+            return jsonify({
                 'success': False,
                 'msg': "Lab not found",
                 'data': {}
             }), 200
 
         if not isCET(conn, cursor, Email, data[0]):
-            jsonify({
+            return jsonify({
                 'success': False,
                 'msg': "You don't have permission.",
                 'data': {}

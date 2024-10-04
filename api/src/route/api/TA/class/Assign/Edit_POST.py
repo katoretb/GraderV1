@@ -13,7 +13,7 @@ import function.grader as grader
 
 gmt_timezone = pytz.timezone('Asia/Bangkok')
 
-def update_database(conn, cursor, questions, qnum, source_files, release_files, lid, base_path, CSYID):
+def update_database(conn, cursor, questions, qnum, source_files, release_files, lid, base_path, CSYID, isADFupdate):
     # Fetch existing questions for the given LID, sorted by QID
     cursor.execute('SELECT QID, SourcePath, ReleasePath FROM question WHERE LID = %s ORDER BY QID', (lid))
     existing_questions = cursor.fetchall()
@@ -69,12 +69,19 @@ def update_database(conn, cursor, questions, qnum, source_files, release_files, 
                 WHERE QID = %s AND LID = %s
             ''', (max_score, source_path, release_path, current_qid, lid))
 
-            if isSourceUpdate:
+            if isSourceUpdate or isADFupdate:
                 select_query = "SELECT Path FROM addfile WHERE LID = %s"
                 cursor.execute(select_query, (lid,))
                 result = cursor.fetchall()
 
                 addfiles = [row[0] for row in result]
+
+                # ADF update but source
+                if not isSourceUpdate:
+                    query = "SELECT SourcePath FROM `question` WHERE `QID`=%s"
+                    cursor.execute(query, (current_qid,))
+                    result = cursor.fetchone()
+                    source_path = result[0]
 
                 Qinfo = grader.QinfoGenerate(source_path, addfile=addfiles)
                 Qinfo_query = "UPDATE `question` SET `Qinfo`=%s WHERE `QID`=%s"
@@ -203,11 +210,12 @@ def main():
                 Due = %s,
                 `Lock` = %s,
                 showScoreOnLock = %s,
+                Exam = %s,
                 """ + GCID + """ = %s
             WHERE 
                 LID = %s;
         """
-        cursor.execute(setLab, (form["LabNum"], form["LabName"], form["PubDate"], form["DueDate"], form["DueDate"] if form["LOD"] == 'true' else None, 1 if form["ShowOnLock"] == 'true' else 0, str(seleted).replace(" ", ""), form["LID"]))
+        cursor.execute(setLab, (form["LabNum"], form["LabName"], form["PubDate"], form["DueDate"], form["DueDate"] if form["LOD"] == 'true' else None, 1 if form["ShowOnLock"] == 'true' else 0, 1 if form["isExam"] == 'true' else 0, str(seleted).replace(" ", ""), form["LID"]))
         conn.commit()
 
         LID = form["LID"]
@@ -233,7 +241,10 @@ def main():
         for i in data:
             os.remove(i[0])
 
+        isADFupdate = False
+
         if len(Additional_files) > 0:
+            isADFupdate = True
             query = """
             DELETE
             FROM 
@@ -254,7 +265,7 @@ def main():
 
         Question = json.loads(request.form.get('Question'))
 
-        update_database(conn, cursor, Question, int(form["QNum"]), Source_files, Release_files, str(LID), os.path.join(UPLOAD_FOLDER, str(form["CSYID"]), str(LID)), form["CSYID"])
+        update_database(conn, cursor, Question, int(form["QNum"]), Source_files, Release_files, str(LID), os.path.join(UPLOAD_FOLDER, str(form["CSYID"]), str(LID)), form["CSYID"], isADFupdate)
         
         return jsonify({
             'success': True,

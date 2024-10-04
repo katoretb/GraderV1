@@ -13,10 +13,12 @@ import ClassEdit    from '../pages/PF/ClassEdit';
 import AssignList   from '../pages/PF/AssignList';
 import AssignCreate from '../pages/PF/AssignCreate';
 import AssignEdit   from '../pages/PF/AssignEdit';
-import AssignSus   from '../pages/PF/AssignSus';
+import AssignSus    from '../pages/PF/AssignSus';
 import Sentin       from '../pages/PF/Sentin';
 import StudentList  from '../pages/PF/StudentList';
-import TAmanage     from '../pages/PF/TAmanage'
+import TAmanage     from '../pages/PF/TAmanage';
+import QRScan       from '../pages/PF/Scan';
+import Checkio       from '../pages/PF/Checkio';
 
 // Student
 import Class        from '../pages/ST/Class';
@@ -41,6 +43,8 @@ function App() {
                     <Route element={<TAmanage />} path='TAmanage' />
                     <Route element={<Sentin />} path='Sentin' />
                     <Route element={<StudentList />} path='StudentList' />
+                    <Route element={<QRScan />} path='Scan' />
+                    <Route element={<Checkio />} path='CheckInOut' />
 
                 </Route>
                 <Route element={<Home />} path='/' />
