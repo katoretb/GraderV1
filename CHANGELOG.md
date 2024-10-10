@@ -1,6 +1,22 @@
 
 # Change Log
 
+## [v1.5.3] - 2024-10-10
+ 
+### Added
+ - show addfile filename in student view
+
+### Changed
+ - Refresh page when close QRCode
+ - Block submit after checkout
+ - Better edit Additional files
+ - Hide check in-out page in normal mode
+ - remove addfile filename prefix
+
+### Fixed
+ - Rank NoneType when MaxScore null
+
+
 ## [v1.5.0] - 2024-10-4
  
 ### Added

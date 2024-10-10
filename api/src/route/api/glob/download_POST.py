@@ -149,6 +149,9 @@ def main():
 
     file_path = os.path.join(addPath, data[0][0])
     filename = data[0][0]
+
+    if FRL[0] == 0:
+        filename = os.path.split(data[0][0])[-1]
     
     if FRL[0] == 1:
         prefilename = os.path.split(data[0][0])[-1].split("_")

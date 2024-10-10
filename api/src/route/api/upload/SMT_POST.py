@@ -11,6 +11,7 @@ from function.loadconfig import UPLOAD_FOLDER, config
 from function.isLock import isLock
 from function.gradeInBackground import gradeInBackground
 from function.loadconfig import executor
+from function.isAccess import isAccess
 
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import serialization, hashes
@@ -52,6 +53,13 @@ def main():
             'msg': "QID is missing in the request",
             'data': {}
         }), 400
+
+    if not isAccess(conn, cursor, Email=Email, QID=QID):
+        return jsonify({
+            'success': False,
+            'msg': 'You do not have access to question.',
+            'data': ""
+        }), 200
 
     try:
 

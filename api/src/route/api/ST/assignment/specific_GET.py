@@ -129,12 +129,12 @@ def main():
 
         # Fetch addfile information
         cur.execute("""
-            SELECT ID
+            SELECT ID, Path
             FROM addfile
             WHERE LID = %s
         """, (LID,))
         add_files = cur.fetchall()
-        add_files_list = [af[0] for af in add_files]
+        add_files_list = [[af[0], os.path.split(af[1])[-1]] for af in add_files]
 
         # Format the JSON response
         result = {
