@@ -300,7 +300,7 @@ function Lab() {
                     return <button key={`QD${i}`} type="button" className="btn btn-outline-dark" style={{width: "100%", textAlign: "Left", marginBottom: "0.5em"}} onClick={() => {downfile(1, q.QID)}}><span style={{color: "rgb(54, 128, 255)"}}><CodeSlash /></span> <b>Question file:</b> {i+1} {q.Date}</button>
                   })}
                   {LabInfo.AddFile.map((a, i) => {
-                    return <button key={`AD${i}`} type="button" className="btn btn-outline-dark" style={{width: "100%", textAlign: "Left", marginBottom: "0.5em"}} onClick={() => {downfile(0, a)}}><span style={{color: "rgb(255, 178, 62)"}}><FileEarmark /></span> <b>Essential file:</b> {a[1]}</button>
+                    return <button key={`AD${i}`} type="button" className="btn btn-outline-dark" style={{width: "100%", textAlign: "Left", marginBottom: "0.5em"}} onClick={() => {downfile(0, a[0])}}><span style={{color: "rgb(255, 178, 62)"}}><FileEarmark /></span> <b>Essential file:</b> {a[1]}</button>
                   })}
                 </div>
               </div>
