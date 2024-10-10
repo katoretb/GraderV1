@@ -20,6 +20,24 @@ function Lab() {
 
   const [LabInfo, setLabInfo] = useState(null)
 
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`${host}/ST/assignment/specific?LID=${LID}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-type": "application/json; charset=UTF-8",
+            "Access-Control-Allow-Origin": "*",
+            "X-CSRF-TOKEN": Cookies.get("csrf_token")
+        }
+      });
+      const data = await response.json();
+      setLabInfo(data.data)
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -193,7 +211,7 @@ function Lab() {
             showCloseButton: true,
             showConfirmButton: false,
         }).then(ok => {
-            window.location.reload()
+          fetchData()
         });
       }else{
         withReactContent(Swal).fire({
