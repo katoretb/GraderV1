@@ -45,7 +45,8 @@ def main():
     """, (CSYID, student_CID, student_GID,))
     MaxScoreResult = cur.fetchall()
 
-    total_max_score = int(MaxScoreResult[0][0])
+
+    total_max_score = int(MaxScoreResult[0][0]) if MaxScoreResult else None
 
     # Calculate student's score
     cur.execute("""

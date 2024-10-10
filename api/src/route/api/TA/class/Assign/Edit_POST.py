@@ -10,10 +10,11 @@ from function.GetGID import GetGID
 from function.loadconfig import UPLOAD_FOLDER
 from function.isCET import isCET
 import function.grader as grader
+from function.regrade import regrade
 
 gmt_timezone = pytz.timezone('Asia/Bangkok')
 
-def update_database(conn, cursor, questions, qnum, source_files, release_files, lid, base_path, CSYID, isADFupdate):
+def update_database(conn, cursor, questions, qnum, source_files, release_files, lid, base_path, CSYID):
     # Fetch existing questions for the given LID, sorted by QID
     cursor.execute('SELECT QID, SourcePath, ReleasePath FROM question WHERE LID = %s ORDER BY QID', (lid))
     existing_questions = cursor.fetchall()
@@ -69,76 +70,77 @@ def update_database(conn, cursor, questions, qnum, source_files, release_files, 
                 WHERE QID = %s AND LID = %s
             ''', (max_score, source_path, release_path, current_qid, lid))
 
-            if isSourceUpdate or isADFupdate:
-                select_query = "SELECT Path FROM addfile WHERE LID = %s"
-                cursor.execute(select_query, (lid,))
-                result = cursor.fetchall()
+            if isSourceUpdate:
+                regrade(conn, cursor, True, current_qid, lid)
+                # select_query = "SELECT Path FROM addfile WHERE LID = %s"
+                # cursor.execute(select_query, (lid,))
+                # result = cursor.fetchall()
 
-                addfiles = [row[0] for row in result]
+                # addfiles = [row[0] for row in result]
 
-                # ADF update but source
-                if not isSourceUpdate:
-                    query = "SELECT SourcePath FROM `question` WHERE `QID`=%s"
-                    cursor.execute(query, (current_qid,))
-                    result = cursor.fetchone()
-                    source_path = result[0]
+                # # ADF update but source
+                # if not isSourceUpdate:
+                #     query = "SELECT SourcePath FROM `question` WHERE `QID`=%s"
+                #     cursor.execute(query, (current_qid,))
+                #     result = cursor.fetchone()
+                #     source_path = result[0]
 
-                Qinfo = grader.QinfoGenerate(source_path, addfile=addfiles)
-                Qinfo_query = "UPDATE `question` SET `Qinfo`=%s WHERE `QID`=%s"
-                cursor.execute(Qinfo_query, (json.dumps(Qinfo), current_qid))
-                conn.commit()
+                # Qinfo = grader.QinfoGenerate(source_path, addfile=addfiles)
+                # Qinfo_query = "UPDATE `question` SET `Qinfo`=%s WHERE `QID`=%s"
+                # cursor.execute(Qinfo_query, (json.dumps(Qinfo), current_qid))
+                # conn.commit()
 
-                select_query = """
-                    SELECT 
-                        `SID`, 
-                        `SummitedFile` 
-                    FROM 
-                        `submitted` 
-                    WHERE
-                        QID = %s
-                """
-                cursor.execute(select_query, (current_qid))
-                result = cursor.fetchall()
+                # select_query = """
+                #     SELECT 
+                #         `SID`, 
+                #         `SummitedFile` 
+                #     FROM 
+                #         `submitted` 
+                #     WHERE
+                #         QID = %s
+                # """
+                # cursor.execute(select_query, (current_qid))
+                # result = cursor.fetchall()
 
-                for SID, filepath in result:
-                    err, data = grader.grade(source_path, filepath, addfile=addfiles, validate=False, check_keyword="ok", Qinfo=Qinfo)
-                    if err:
-                        # return jsonify({
-                        #     'success': False,
-                        #     'msg': f'There is a problem while grading.\n{data}',
-                        #     'data': {}
-                        # }), 200
-                        data = [[0,1]]
+                # for SID, filepath in result:
+                #     err, data = grader.grade(source_path, filepath, addfile=addfiles, validate=False, check_keyword="ok", Qinfo=Qinfo)
+                #     if err:
+                #         # return jsonify({
+                #         #     'success': False,
+                #         #     'msg': f'There is a problem while grading.\n{data}',
+                #         #     'data': {}
+                #         # }), 200
+                #         data = [[0,1]]
 
-                    s, m = 0, 0
+                #     s, m = 0, 0
 
-                    if len(data) == 1:
-                        s += float(data[0][0])  # Ensure data is converted to float
-                        m += float(data[0][1])  # Ensure data is converted to float
-                    else:
-                        for j in range(len(data)):
-                            s += float(data[j][0])  # Ensure data is converted to float
-                            m += float(data[j][1])  # Ensure data is converted to float
+                #     if len(data) == 1:
+                #         s += float(data[0][0])  # Ensure data is converted to float
+                #         m += float(data[0][1])  # Ensure data is converted to float
+                #     else:
+                #         for j in range(len(data)):
+                #             s += float(data[j][0])  # Ensure data is converted to float
+                #             m += float(data[j][1])  # Ensure data is converted to float
 
-                    # Check if m is zero to avoid division by zero
-                    if m == 0:
-                        Score = 0
-                    else:
-                        Score = float("{:.2f}".format((s / m) * float(max_score)))  # Ensure MaxScore is converted to float
+                #     # Check if m is zero to avoid division by zero
+                #     if m == 0:
+                #         Score = 0
+                #     else:
+                #         Score = float("{:.2f}".format((s / m) * float(max_score)))  # Ensure MaxScore is converted to float
 
-                    # Define the insert or update query
-                    upsert_query = """
-                        UPDATE 
-                            `submitted` 
-                        SET 
-                            `Score` = %s 
-                        WHERE 
-                            `SID` = %s
-                    """
+                #     # Define the insert or update query
+                #     upsert_query = """
+                #         UPDATE 
+                #             `submitted` 
+                #         SET 
+                #             `Score` = %s 
+                #         WHERE 
+                #             `SID` = %s
+                #     """
 
-                    # Execute the query with the provided values
-                    cursor.execute(upsert_query, (Score, SID))
-                    conn.commit()
+                #     # Execute the query with the provided values
+                #     cursor.execute(upsert_query, (Score, SID))
+                #     conn.commit()
 
         else:
             # Ensure source_path and release_path are not None before inserting
@@ -191,7 +193,7 @@ def main():
     try:
         Source_files = {k.replace("Source", ""):v for k, v in request.files.items() if k.startswith("Source")}
         Release_files = {k.replace("Release", ""):v for k, v in request.files.items() if k.startswith("Release")}
-        Additional_files = [v for k, v in request.files.items() if k.startswith("Add")]
+        # Additional_files = [v for k, v in request.files.items() if k.startswith("Add")]
 
         # Path = <CSYID>/<LID>/(Addi)
         # Path = <CSYID>/<LID>/Source_(index)_(Source)
@@ -221,51 +223,51 @@ def main():
         LID = form["LID"]
 
 
-        # check path
-        AddDirec = os.path.join(UPLOAD_FOLDER, form["CSYID"], LID)
-        if not os.path.exists(AddDirec):
-            os.makedirs(AddDirec)
+        # # check path
+        # AddDirec = os.path.join(UPLOAD_FOLDER, form["CSYID"], LID)
+        # if not os.path.exists(AddDirec):
+        #     os.makedirs(AddDirec)
 
 
-        query = """
-        SELECT
-            ADF.Path
-        FROM 
-            addfile ADF
-        WHERE 
-            ADF.LID = %s
-        """
-        cursor.execute(query, (LID))
-        data = cursor.fetchall()
+        # query = """
+        # SELECT
+        #     ADF.Path
+        # FROM 
+        #     addfile ADF
+        # WHERE 
+        #     ADF.LID = %s
+        # """
+        # cursor.execute(query, (LID))
+        # data = cursor.fetchall()
 
-        for i in data:
-            os.remove(i[0])
+        # for i in data:
+        #     os.remove(i[0])
 
-        isADFupdate = False
+        # isADFupdate = False
 
-        if len(Additional_files) > 0:
-            isADFupdate = True
-            query = """
-            DELETE
-            FROM 
-                addfile ADF
-            WHERE 
-                ADF.LID = %s
-            """
-            cursor.execute(query, (LID))
-            conn.commit()
+        # if len(Additional_files) > 0:
+        #     isADFupdate = True
+        #     query = """
+        #     DELETE
+        #     FROM 
+        #         addfile ADF
+        #     WHERE 
+        #         ADF.LID = %s
+        #     """
+        #     cursor.execute(query, (LID))
+        #     conn.commit()
 
 
-        for i in Additional_files:
-            AddPath = os.path.join(AddDirec, i.filename)
-            i.save(AddPath)
-            addFile = "INSERT INTO addfile (LID, Path, CSYID) VALUES (%s, %s, %s)"
-            cursor.execute(addFile, (LID, AddPath, form["CSYID"]))
-            conn.commit()
+        # for i in Additional_files:
+        #     AddPath = os.path.join(AddDirec, i.filename)
+        #     i.save(AddPath)
+        #     addFile = "INSERT INTO addfile (LID, Path, CSYID) VALUES (%s, %s, %s)"
+        #     cursor.execute(addFile, (LID, AddPath, form["CSYID"]))
+        #     conn.commit()
 
         Question = json.loads(request.form.get('Question'))
 
-        update_database(conn, cursor, Question, int(form["QNum"]), Source_files, Release_files, str(LID), os.path.join(UPLOAD_FOLDER, str(form["CSYID"]), str(LID)), form["CSYID"], isADFupdate)
+        update_database(conn, cursor, Question, int(form["QNum"]), Source_files, Release_files, str(LID), os.path.join(UPLOAD_FOLDER, str(form["CSYID"]), str(LID)), form["CSYID"])
         
         return jsonify({
             'success': True,
