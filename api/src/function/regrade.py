@@ -16,12 +16,12 @@ def regrade(conn, cursor, isSourceUpdate: bool, QID, LID):
 
     addfiles = [row[0] for row in result]
 
-    # ADF update but source
-    if not isSourceUpdate:
-        query = "SELECT SourcePath FROM `question` WHERE `QID`=%s"
-        cursor.execute(query, (QID,))
-        result = cursor.fetchone()
-        source_path = result[0]
+    # # ADF update but source
+    # if not isSourceUpdate:
+    query = "SELECT SourcePath FROM `question` WHERE `QID`=%s"
+    cursor.execute(query, (QID,))
+    result = cursor.fetchone()
+    source_path = result[0]
 
     Qinfo = grader.QinfoGenerate(source_path, addfile=addfiles)
     Qinfo_query = "UPDATE `question` SET `Qinfo`=%s WHERE `QID`=%s"

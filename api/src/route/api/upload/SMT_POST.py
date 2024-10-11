@@ -20,12 +20,6 @@ from binascii import unhexlify
 
 gmt_timezone = pytz.timezone('Asia/Bangkok')
 
-def delete_file(file_path):
-    if os.path.exists(file_path):
-        os.remove(file_path)
-        return True
-    return False
-
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 @jwt_required()
