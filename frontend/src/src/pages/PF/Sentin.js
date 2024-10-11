@@ -266,7 +266,7 @@ function Sentin() {
                                         {smt["Score"]}/{smt["MaxScore"]}
                                       </div>
                                       <div className='col-1'>
-                                        <button type="button" class="btn btn-outline-dark" onClick={() => {loadSub(smt["SID"])}}><Download /></button>
+                                        {smt["SID"] > -1 ? <button type="button" class="btn btn-outline-dark" onClick={() => {loadSub(smt["SID"])}}><Download /></button>: ""}
                                       </div>
                                     </div>
                                     {/* <td style={{color: `${smt["Late"] ? 'red' : 'black'}`}}>Q{smtIndex + 1}: {smt["Time"]}</td>
