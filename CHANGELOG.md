@@ -1,6 +1,21 @@
 
 # Change Log
 
+## [v1.5.4] - 2024-10-10
+ 
+### Added
+ - download all files button for student
+ - download all lab files button for TA this will download all source, release and essential file
+ - download sepecific file button in sent in page
+ - download all sent in file button in sent in page
+ - version tag in navbar
+
+### Changed
+
+### Fixed
+ - regrade function
+
+
 ## [v1.5.3] - 2024-10-10
  
 ### Added

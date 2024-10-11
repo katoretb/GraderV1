@@ -583,6 +583,54 @@ function AssignEdit() {
     })
   }
 
+  const loadlab = async () => {
+    fetch(`${process.env.REACT_APP_HOST}/TA/class/Assign/downloadLabZip`, {
+      method: 'POST',
+      credentials: "include",
+      headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          "X-CSRF-TOKEN": await Cookies.get("csrf_token")
+      },
+      body: JSON.stringify({ LID: LID})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success){
+          // Decode base64-encoded file content
+          const decodedFileContent = atob(data.fileContent);
+
+          // Convert decoded content to a Uint8Array
+          const arrayBuffer = new Uint8Array(decodedFileContent.length);
+          for (let i = 0; i < decodedFileContent.length; i++) {
+              arrayBuffer[i] = decodedFileContent.charCodeAt(i);
+          }
+
+          // Create a Blob from the array buffer
+          const blob = new Blob([arrayBuffer], { type: data.fileType });
+
+          // Create a temporary URL to the blob
+          const url = window.URL.createObjectURL(blob);
+
+          // Create a link element to trigger the download
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = data.downloadFilename;
+          document.body.appendChild(a);
+          a.click();
+
+          // Clean up by revoking the object URL
+          window.URL.revokeObjectURL(url);
+        }else{
+          withReactContent(Swal).fire({
+            title: data.msg,
+            icon: "error"
+          })
+        }
+    })
+    .catch(error => console.error('Error:', error));
+  }
+
   return (
     <div>
       <Navbar />
@@ -617,9 +665,10 @@ function AssignEdit() {
                 </ul>
               </div>
               <div className="col-md-5">
-                <button type="button" className="btn btn-danger float-end" style={{marginLeft:"40px"}} id="liveToastBtn" onClick={handleButtonDelete}>Delete</button>
-                <button type="button" className="btn btn-primary float-end" style={{marginLeft:"20px"}} id="liveToastBtn" onClick={handleButtonClick}>Save</button>
+                <button type="button" className="btn btn-danger float-end" style={{marginLeft:"2em"}} id="liveToastBtn" onClick={handleButtonDelete}>Delete</button>
+                <button type="button" className="btn btn-primary float-end" style={{marginLeft:"1em"}} id="liveToastBtn" onClick={handleButtonClick}>Save</button>
                 <button type="button" className="btn btn-primary float-end" onClick={() => navigate("/AssignList")}>Back</button>
+                <button className="btn btn-outline-dark float-end" type="button" onClick={() => {loadlab()}} style={{marginRight: "1em"}}>Download</button>
               </div>
             </div>
           </div>
