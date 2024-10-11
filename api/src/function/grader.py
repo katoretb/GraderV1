@@ -117,7 +117,7 @@ def grade(Question, submit, addfile=[], validate=True, timeout=20, check_keyword
 
             # Write method protection
             if(protectWrite):
-                if ".write(" in TempSol: return True, "This file contain file write method it may broke the additional assignment files"
+                if ".write(" in TempSol or "os.remove(" in TempSol: return True, "This file contain file write method it may broke the additional assignment files"
             
             # join solution
             solution.append("".join(TempSol.split(temporarySplitWord)))         
