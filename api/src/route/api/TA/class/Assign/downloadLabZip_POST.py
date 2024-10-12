@@ -76,7 +76,7 @@ def main():
                 prefilenamer = str(os.path.split(flr)[-1]).split("_")
                 prefilenames = str(os.path.split(fls)[-1]).split("_")
                 release = f'Release_{str(lab[1]).replace(".", "-")}_L{LN}_Q{int(prefilenamer[1]) + 1}.ipynb'
-                source = f'Release_{str(lab[1]).replace(".", "-")}_L{LN}_Q{int(prefilenames[1]) + 1}.ipynb'
+                source = f'Source_{str(lab[1]).replace(".", "-")}_L{LN}_Q{int(prefilenames[1]) + 1}.ipynb'
 
                 file_content = ""
                 with open(flr, "rb") as file:
