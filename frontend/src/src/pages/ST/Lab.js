@@ -344,7 +344,7 @@ function Lab() {
                 <div className='card-header'>
                   <div className='row'>
                     <div className='col'>
-                      <h5><Download /> Downlaod files</h5>
+                      <h5><Download /> Download files</h5>
                     </div>
                     <div className='col-4'>
                     <button type="button" className="btn btn-outline-dark" onClick={downall}>Download All</button>
