@@ -340,7 +340,7 @@ function AssignCreate() {
                       onChange={handleDueDateChange}
                       min={publishDate}
                     />
-                    <input id={`duedatelock`} className="form-check-input" type="checkbox" checked={dueDateLock} onChange={() => setDueDateLock(!dueDateLock)} disabled={isExam}/>
+                    <input id={`duedatelock`} className="form-check-input" type="checkbox" checked={dueDateLock} onChange={() => setDueDateLock(!dueDateLock)}/>
                     <label className="form-check-label" htmlFor="duedatelock" style={{marginLeft: "0.3rem"}}>Close submission on Due date</label>
                   </div>
                 </div>
@@ -351,7 +351,7 @@ function AssignCreate() {
                 <input id={`showlock`} className="form-check-input" type="checkbox" checked={showLock} onChange={() => setShowLock(!showLock)}/>
                 <label className="form-check-label" htmlFor="showlock" style={{marginLeft: "0.3rem"}}>Show the score only after lab is locked.</label>
                 <br/>
-                <input id={`isExam`} className="form-check-input" type="checkbox" checked={isExam} onChange={() => {setIsExam(!isExam);setDueDateLock(true)}}/>
+                <input id={`isExam`} className="form-check-input" type="checkbox" checked={isExam} onChange={() => {setIsExam(!isExam);}}/>
                 <label className="form-check-label" htmlFor="isExam" style={{marginLeft: "0.3rem"}}>Examination mode.</label>
               </div>
             </div>

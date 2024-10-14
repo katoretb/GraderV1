@@ -1,6 +1,16 @@
 
 # Change Log
 
+## [v1.5.5] - 2024-10-15
+ 
+### Added
+
+### Changed
+ - independent LockOnDue and Exam mode
+
+### Fixed
+
+
 ## [v1.5.4] - 2024-10-10
  
 ### Added
