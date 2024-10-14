@@ -10,6 +10,7 @@ from cryptography.hazmat.primitives import serialization
 from function.checkPermSubmitDown import checkPermSubmitDown
 from function.checkPermQDown import checkPermQDown
 from function.checkPermAddDown import checkPermAddDown
+from function.isAccess import isAccess
 from function.loadconfig import UPLOAD_FOLDER, config
 
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -22,9 +23,9 @@ def main():
     fileRequest = data.get('fileRequest')
     
     # 0_<perm>_<ID>        <Additional file>
-    # 1_<perm>_<QID>       <Question release>
-    # 1_<perm>_<QID>       <Question source>
-    # 2_<perm>_<SID>       <Submission>
+    # 1_<perm 0>_<QID>       <Question release>
+    # 1_<perm 1>_<QID>       <Question source>
+    # 2_<perm 0>_<SID>       <Submission>
     # 3_<perm>_<csyid>     <Thumbnail>
     # 
     # <perm>
@@ -62,6 +63,12 @@ def main():
                 'msg': 'You do not have access to this file.',
                 'data': ""
             }), 200
+        if not isAccess(g.db, cur, Email=Email, FID=FRL[2]):
+            return jsonify({
+                'success': False,
+                'msg': 'You do not have access to this file.',
+                'data': ""
+            }), 200
         query = "SELECT Path FROM addfile WHERE ID = %s"
     elif FRL[0] == 1:
         if FRL[1] == 0:
@@ -71,9 +78,15 @@ def main():
                     'msg': 'You do not have access to this file.',
                     'data': ""
                 }), 200
-            query = "SELECT ReleasePath, LID FROM question WHERE QID = %s"
             if checkPermQDown(FRL[2], Email, 1, cur):
                 editBefore = False
+            elif not isAccess(g.db, cur, Email=Email, QID=FRL[2]):
+                return jsonify({
+                    'success': False,
+                    'msg': 'You do not have access to this file.',
+                    'data': ""
+                }), 200
+            query = "SELECT ReleasePath, LID FROM question WHERE QID = %s"
         elif FRL[1] == 1:
             if not checkPermQDown(FRL[2], Email, 1, cur):
                 return jsonify({
@@ -90,6 +103,12 @@ def main():
             }), 200
     elif FRL[0] == 2:
         if not checkPermSubmitDown(FRL[2], Email, cur):
+            return jsonify({
+                'success': False,
+                'msg': 'You do not have access to this file.',
+                'data': ""
+            }), 200
+        if not isAccess(g.db, cur, Email=Email, SID=FRL[2]):
             return jsonify({
                 'success': False,
                 'msg': 'You do not have access to this file.',
@@ -130,6 +149,9 @@ def main():
 
     file_path = os.path.join(addPath, data[0][0])
     filename = data[0][0]
+
+    if FRL[0] == 0:
+        filename = os.path.split(data[0][0])[-1]
     
     if FRL[0] == 1:
         prefilename = os.path.split(data[0][0])[-1].split("_")

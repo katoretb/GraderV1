@@ -18,12 +18,6 @@ from binascii import unhexlify
 
 gmt_timezone = pytz.timezone('Asia/Bangkok')
 
-def delete_file(file_path):
-    if os.path.exists(file_path):
-        os.remove(file_path)
-        return True
-    return False
-
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 def main():
@@ -137,7 +131,7 @@ def main():
         CSYID = result[2]
         Source = result[3]
         MaxScore = result[4]
-        Qinfo = None if result[6] == None else json.loads(result[6])
+        Qinfo = None if result[6] is None else json.loads(result[6])
 
         # Query to select additional files (addfile) paths related to LID
         select_query = "SELECT Path FROM addfile WHERE LID = %s"

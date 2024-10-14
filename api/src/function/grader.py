@@ -53,7 +53,7 @@ def QinfoGenerate(Question, addfile=[]) -> dict:
 
     # Tester
     for i in range(len(ScodeCell)):
-        if (ScodeCell[i]["metadata"]["nbgrader"]["solution"] == False) and (ScodeCell[i]["metadata"]["nbgrader"].get("points") == None) and "mock_stdout.getvalue()" in "".join(ScodeCell[i]["source"]):
+        if (ScodeCell[i]["metadata"]["nbgrader"]["solution"] == False) and (ScodeCell[i]["metadata"]["nbgrader"].get("points") is None) and "mock_stdout.getvalue()" in "".join(ScodeCell[i]["source"]):
             template["TesterLoc"] = i
             template["Tester"] = "".join(ScodeCell[i]["source"])
         
@@ -117,7 +117,7 @@ def grade(Question, submit, addfile=[], validate=True, timeout=20, check_keyword
 
             # Write method protection
             if(protectWrite):
-                if ".write(" in TempSol: return True, "This file contain file write method it may broke the additional assignment files"
+                if ".write(" in TempSol or "os.remove(" in TempSol: return True, "This file contain file write method it may broke the additional assignment files"
             
             # join solution
             solution.append("".join(TempSol.split(temporarySplitWord)))         

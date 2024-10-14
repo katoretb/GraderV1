@@ -20,6 +20,24 @@ function Lab() {
 
   const [LabInfo, setLabInfo] = useState(null)
 
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`${host}/ST/assignment/specific?LID=${LID}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-type": "application/json; charset=UTF-8",
+            "Access-Control-Allow-Origin": "*",
+            "X-CSRF-TOKEN": Cookies.get("csrf_token")
+        }
+      });
+      const data = await response.json();
+      setLabInfo(data.data)
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -169,6 +187,95 @@ function Lab() {
       })
     }
   }
+
+  const tiketQR = async (Type) => {
+    try{
+      const response = await fetch(`${host}/ST/assignment/ticket?LID=${LID}&CSYID=${classId}&Type=${Type}`, {
+        method: 'GET',
+        credentials: "include",
+        headers: {
+            "X-CSRF-TOKEN": Cookies.get("csrf_token")
+        }
+      })
+      const Data = await response.json()
+      if (Data.success){
+        withReactContent(Swal).fire({
+            title: Type === 0 ? "Request to leave" : "Request to enter",
+            // text: Data['data']['msg'],
+            // icon: "success"
+            html: `
+              <img src="${Data['data']['qr']}">
+              <a style="color:rgb(160, 160, 160)">${Data['data']['ID']}</a><br/>
+              <a><b>Student ID:</b> ${Email.split("@")[0]}</a>
+            `,
+            showCloseButton: true,
+            showConfirmButton: false,
+        }).then(ok => {
+          fetchData()
+        });
+      }else{
+        withReactContent(Swal).fire({
+          title: Data.msg,
+          icon: Data.data
+        })
+      }
+    }catch (error) {
+      withReactContent(Swal).fire({
+          title: "Please contact admin!",
+          text: error,
+          icon: "error"
+      })
+    }
+  }
+
+  const downall = async () => {
+    fetch(`${process.env.REACT_APP_HOST}/ST/assignment/downloadZip`, {
+      method: 'POST',
+      credentials: "include",
+      headers: {
+          "Content-type": "application/json; charset=UTF-8",
+          "Access-Control-Allow-Origin": "*",
+          "X-CSRF-TOKEN": Cookies.get("csrf_token")
+      },
+        body: JSON.stringify({ LID: LID})
+    })
+    .then(response => response.json())
+    .then(data => {
+      if(data.success){
+        // Decode base64-encoded file content
+        const decodedFileContent = atob(data.fileContent);
+
+        // Convert decoded content to a Uint8Array
+        const arrayBuffer = new Uint8Array(decodedFileContent.length);
+        for (let i = 0; i < decodedFileContent.length; i++) {
+            arrayBuffer[i] = decodedFileContent.charCodeAt(i);
+        }
+
+        // Create a Blob from the array buffer
+        const blob = new Blob([arrayBuffer], { type: data.fileType });
+
+        // Create a temporary URL to the blob
+        const url = window.URL.createObjectURL(blob);
+
+        // Create a link element to trigger the download
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = data.downloadFilename;
+        document.body.appendChild(a);
+        a.click();
+
+        // Clean up by revoking the object URL
+        window.URL.revokeObjectURL(url);
+      }else{
+        withReactContent(Swal).fire({
+          title: data.msg,
+          icon: "error"
+        })
+      }
+    })
+    .catch(error => console.error('Error:', error));
+  }
   
   return (
     <div>
@@ -191,8 +298,14 @@ function Lab() {
             <div className="col">
               <h5>Assignment</h5>
             </div>
-            <div className="col-md-2">
-              <button type="button" className="btn btn-primary float-end" onClick={() => navigate("/Class")}>Back</button>
+            <div className="col-md-3">
+              <button type="button" className="btn btn-primary float-end" style={{marginLeft:"20px"}} onClick={() => navigate("/Class")}>Back</button>
+              {LabInfo && LabInfo.Info["Exam"] ? 
+                LabInfo.Info["Access"] ? 
+                <button type="button" className="btn btn-info float-end" onClick={() => tiketQR(0)}>Request to leave</button> 
+                :
+                <button type="button" className="btn btn-info float-end" onClick={() => tiketQR(1)}>Request to enter</button>
+              :""}
             </div>
           </div>
         </div>
@@ -226,19 +339,28 @@ function Lab() {
                 </div>
               </div>
               <br/>
+              {LabInfo.Info["Access"] ? (
               <div className='card'>
                 <div className='card-header'>
-                  <h5><Download /> Downlaod files</h5>
+                  <div className='row'>
+                    <div className='col'>
+                      <h5><Download /> Download files</h5>
+                    </div>
+                    <div className='col-4'>
+                    <button type="button" className="btn btn-outline-dark" onClick={downall}>Download All</button>
+                    </div>
+                  </div>
                 </div>
                 <div className='card-body'>
                   {LabInfo.Question.map((q, i) => {
                     return <button key={`QD${i}`} type="button" className="btn btn-outline-dark" style={{width: "100%", textAlign: "Left", marginBottom: "0.5em"}} onClick={() => {downfile(1, q.QID)}}><span style={{color: "rgb(54, 128, 255)"}}><CodeSlash /></span> <b>Question file:</b> {i+1} {q.Date}</button>
                   })}
                   {LabInfo.AddFile.map((a, i) => {
-                    return <button key={`AD${i}`} type="button" className="btn btn-outline-dark" style={{width: "100%", textAlign: "Left", marginBottom: "0.5em"}} onClick={() => {downfile(0, a)}}><span style={{color: "rgb(255, 178, 62)"}}><FileEarmark /></span> <b>Essential file:</b> {i+1}</button>
+                    return <button key={`AD${i}`} type="button" className="btn btn-outline-dark" style={{width: "100%", textAlign: "Left", marginBottom: "0.5em"}} onClick={() => {downfile(0, a[0])}}><span style={{color: "rgb(255, 178, 62)"}}><FileEarmark /></span> <b>Essential file:</b> {a[1]}</button>
                   })}
                 </div>
               </div>
+              ) : ("")}
             </div>
             <div className='col'>
               {LabInfo.Question.map((q, i) => {
@@ -254,6 +376,7 @@ function Lab() {
                     </div>
                   </div>
                   <div className='card-body'>
+                    {LabInfo.Info["Access"] ? (
                     <div className='row'>
                       <div className='col'>
                         <div className="input-group">
@@ -264,6 +387,7 @@ function Lab() {
                         <button className="btn btn-primary float-end" type="button" id={`Q${q.QID}`} onClick={() => {submit(q.QID, i+1)}} disabled={LabInfo.Info["Lock"]}>Submit</button>
                       </div>
                     </div>
+                    ):("")}
                     <br/>
                     <div className='row'>
                       <div className='col'>
@@ -273,7 +397,7 @@ function Lab() {
                             ("-") : (
                               <span>
                                 {q.SMT.Filename} <span style={{color: "rgb(91, 91, 91)", fontSize: "0.8rem"}}>{q.SMT.Date}</span>
-                                <button type="button" className="btn btn-outline-dark" style={{width: "auto", textAlign: "Left", marginLeft: "0.5em"}} onClick={() => {downfile(2, q.SMT.SID)}}><Download /> Download</button>
+                                {LabInfo.Info["Access"] ? (<button type="button" className="btn btn-outline-dark" style={{width: "auto", textAlign: "Left", marginLeft: "0.5em"}} onClick={() => {downfile(2, q.SMT.SID)}}><Download /> Download</button>):("")}
                                 <br/><span style={{color: "rgb(101, 101, 101)",fontSize: "1 rem"}}>{'('}<b>Original</b>: {q.SMT.OriginalName}{')'}</span>
                               </span>
                           )}

@@ -38,3 +38,5 @@ test.py
 client_secrets.json
 scvrb.txt
 pjconfig/
+
+frontend/node_modules

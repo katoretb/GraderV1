@@ -1,7 +1,11 @@
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content';
+
 import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/Navbar'
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import {Download} from 'react-bootstrap-icons';
 
 
 const host = `${process.env.REACT_APP_HOST}`
@@ -73,6 +77,102 @@ function Sentin() {
     }));
   };
 
+  const loadSub = async (SID) => {
+    fetch(`${process.env.REACT_APP_HOST}/TA/class/Assign/downloadSub`, {
+      method: 'POST',
+      credentials: "include",
+      headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          "X-CSRF-TOKEN": await Cookies.get("csrf_token")
+      },
+      body: JSON.stringify({ SID: SID})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success){
+          // Decode base64-encoded file content
+          const decodedFileContent = atob(data.fileContent);
+
+          // Convert decoded content to a Uint8Array
+          const arrayBuffer = new Uint8Array(decodedFileContent.length);
+          for (let i = 0; i < decodedFileContent.length; i++) {
+              arrayBuffer[i] = decodedFileContent.charCodeAt(i);
+          }
+
+          // Create a Blob from the array buffer
+          const blob = new Blob([arrayBuffer], { type: data.fileType });
+
+          // Create a temporary URL to the blob
+          const url = window.URL.createObjectURL(blob);
+
+          // Create a link element to trigger the download
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = data.downloadFilename;
+          document.body.appendChild(a);
+          a.click();
+
+          // Clean up by revoking the object URL
+          window.URL.revokeObjectURL(url);
+        }else{
+          withReactContent(Swal).fire({
+            title: data.msg,
+            icon: "error"
+          })
+        }
+    })
+    .catch(error => console.error('Error:', error));
+  }
+
+  const downall = async () => {
+    fetch(`${process.env.REACT_APP_HOST}/TA/class/Assign/downloadSubZip`, {
+      method: 'POST',
+      credentials: "include",
+      headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          "X-CSRF-TOKEN": await Cookies.get("csrf_token")
+      },
+      body: JSON.stringify({ LID: LID})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success){
+          // Decode base64-encoded file content
+          const decodedFileContent = atob(data.fileContent);
+
+          // Convert decoded content to a Uint8Array
+          const arrayBuffer = new Uint8Array(decodedFileContent.length);
+          for (let i = 0; i < decodedFileContent.length; i++) {
+              arrayBuffer[i] = decodedFileContent.charCodeAt(i);
+          }
+
+          // Create a Blob from the array buffer
+          const blob = new Blob([arrayBuffer], { type: data.fileType });
+
+          // Create a temporary URL to the blob
+          const url = window.URL.createObjectURL(blob);
+
+          // Create a link element to trigger the download
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = data.downloadFilename;
+          document.body.appendChild(a);
+          a.click();
+
+          // Clean up by revoking the object URL
+          window.URL.revokeObjectURL(url);
+        }else{
+          withReactContent(Swal).fire({
+            title: data.msg,
+            icon: "error"
+          })
+        }
+    })
+    .catch(error => console.error('Error:', error));
+  }
+
   return (
     <div>
       <Navbar />
@@ -98,13 +198,17 @@ function Sentin() {
                 <li className="nav-item">
                   <button className="nav-link active" >Sent in</button>
                 </li>
-                  <li className="nav-item">
-                      <button className="nav-link link" onClick={() =>{sessionStorage.setItem("LID", LID);sessionStorage.setItem("classId", classId);navigate("/AssignSus")}} >Suspicious</button>
-                  </li>
+                <li className="nav-item">
+                  <button className="nav-link link" onClick={() =>{sessionStorage.setItem("LID", LID);sessionStorage.setItem("classId", classId);navigate("/AssignSus")}} >Suspicious</button>
+                </li>
+                <li className="nav-item">
+                  <button className="nav-link link" onClick={() =>{sessionStorage.setItem("LID", LID);sessionStorage.setItem("classId", classId);navigate("/CheckInOut")}} >Check in-out</button>
+                </li>
               </ul>
             </div>
-            <div className="col-md-2">
+            <div className="col-md-3">
               <button className="btn btn-primary float-end" type="button" onClick={() => navigate("/AssignList")}>Back</button>
+              <button className="btn btn-outline-dark float-end" type="button" onClick={() => {downall()}} style={{marginRight: "1em"}}>Download all</button>
             </div>
           </div>
         </div>
@@ -148,14 +252,26 @@ function Sentin() {
                       {openDropdown[index] && (
                         <tr>
                           <td colSpan="5">
-                            <table className="table">
+                            <table className="table" style={{margin: "0px"}}>
                               <thead>
                               </thead>
                               <tbody>
                                 {element["SMT"].map((smt, smtIndex) => (
                                   <tr key={smtIndex}>
-                                    <td style={{color: `${smt["Late"] ? 'red' : 'black'}`}}>Q{smtIndex + 1}: {smt["Time"]}</td>
+                                    <div className='row' style={{color: `${smt["Late"] ? 'red' : 'black'}`}}>
+                                      <div className='col'>
+                                        Q{smtIndex + 1}: {smt["Time"]}
+                                      </div>
+                                      <div className='col-2'>
+                                        {smt["Score"]}/{smt["MaxScore"]}
+                                      </div>
+                                      <div className='col-1'>
+                                        {smt["SID"] > -1 ? <button type="button" class="btn btn-outline-dark" onClick={() => {loadSub(smt["SID"])}}><Download /></button>: ""}
+                                      </div>
+                                    </div>
+                                    {/* <td style={{color: `${smt["Late"] ? 'red' : 'black'}`}}>Q{smtIndex + 1}: {smt["Time"]}</td>
                                     <td style={{color: `${smt["Late"] ? 'red' : 'black'}`}}>{smt["Score"]}/{smt["MaxScore"]}</td>
+                                    <td style={{color: `${smt["Late"] ? 'red' : 'black'}`}}><button type="button" class="btn btn-outline-dark" onClick={() => {loadSub(smt["SID"])}}><Download /></button></td> */}
                                   </tr>
                                 ))}
                               </tbody>

@@ -23,6 +23,7 @@ function AssignCreate() {
   const [dueDate, setDueDate] = useState('')
   const [dueDateLock, setDueDateLock] = useState(false)
   const [showLock, setShowLock] = useState(false)
+  const [isExam, setIsExam] = useState(false)
 
   // Question Sys
   const [totalQNum, setTotalQNum] = useState(1);
@@ -209,6 +210,7 @@ function AssignCreate() {
           formData.append("DueDate", dueDate);
           formData.append('LockOnDue', dueDateLock);
           formData.append('ShowOnLock', showLock);
+          formData.append('isExam', isExam);
 
           formData.append('CSYID', classId);
 
@@ -338,7 +340,7 @@ function AssignCreate() {
                       onChange={handleDueDateChange}
                       min={publishDate}
                     />
-                    <input id={`duedatelock`} className="form-check-input" type="checkbox" checked={dueDateLock} onChange={() => setDueDateLock(!dueDateLock)}/>
+                    <input id={`duedatelock`} className="form-check-input" type="checkbox" checked={dueDateLock} onChange={() => setDueDateLock(!dueDateLock)} disabled={isExam}/>
                     <label className="form-check-label" htmlFor="duedatelock" style={{marginLeft: "0.3rem"}}>Close submission on Due date</label>
                   </div>
                 </div>
@@ -348,6 +350,9 @@ function AssignCreate() {
                 <input type="number" min="1" className="form-control" id="inputQnum" value={totalQNum} onChange={handleTotalQNumChange} />
                 <input id={`showlock`} className="form-check-input" type="checkbox" checked={showLock} onChange={() => setShowLock(!showLock)}/>
                 <label className="form-check-label" htmlFor="showlock" style={{marginLeft: "0.3rem"}}>Show the score only after lab is locked.</label>
+                <br/>
+                <input id={`isExam`} className="form-check-input" type="checkbox" checked={isExam} onChange={() => {setIsExam(!isExam);setDueDateLock(true)}}/>
+                <label className="form-check-label" htmlFor="isExam" style={{marginLeft: "0.3rem"}}>Examination mode.</label>
               </div>
             </div>
             <div className="row">

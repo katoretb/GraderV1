@@ -11,7 +11,7 @@ from function.loadconfig import UPLOAD_FOLDER
 from function.isCET import isCET
 import function.grader as grader
 
-gmt_timezone = pytz.timezone('GMT')
+gmt_timezone = pytz.timezone('Asia/Bangkok')
 
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -47,8 +47,8 @@ def main():
 
         GCID = "GID" if (form["IsGroup"] == 'true') else "CID"
 
-        addLab = f"INSERT INTO lab (Lab, Name, Publish, Due, `Lock`, showScoreOnLock, {GCID}, CSYID, Creator) VALUES " + "(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        cursor.execute(addLab, (form["LabNum"], form["LabName"], form["PubDate"], form["DueDate"], LockOnDue, 1 if form["ShowOnLock"] == 'true' else 0, str(seleted).replace(" ", ""), form["CSYID"], Email))
+        addLab = f"INSERT INTO lab (Lab, Name, Publish, Due, `Lock`, showScoreOnLock, Exam, {GCID}, CSYID, Creator) VALUES " + "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(addLab, (form["LabNum"], form["LabName"], form["PubDate"], form["DueDate"], LockOnDue, 1 if form["ShowOnLock"] == 'true' else 0, 1 if form["isExam"] == 'true' else 0, str(seleted).replace(" ", ""), form["CSYID"], Email))
         conn.commit()
 
         LID = str(cursor.lastrowid)

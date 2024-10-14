@@ -31,15 +31,15 @@ def main():
     cursor.execute(query, (LID,))
     data = cursor.fetchone()
     
-    if data == None:
-        jsonify({
+    if data is None:
+        return jsonify({
             'success': False,
             'msg': "Lab not found",
             'data': {}
         }), 200
 
     if not isCET(conn, cursor, Email, data[0]):
-        jsonify({
+        return jsonify({
             'success': False,
             'msg': "You don't have permission.",
             'data': {}
@@ -112,7 +112,7 @@ def main():
                 QID, MaxScore = question
 
                 query = """
-                    SELECT Score, Timestamp
+                    SELECT Score, Timestamp, SID
                     FROM submitted
                     WHERE UID = %s AND QID = %s AND LID = %s
                 """
@@ -120,6 +120,7 @@ def main():
                 submission = cursor.fetchone()
                 score = submission[0] if submission and submission[0] is not None else 0
                 timestamp = submission[1] if submission else None
+                SID = submission[2] if submission else -1
 
                 if timestamp:
                     timestamp_str = timestamp.strftime("%d/%m/%Y %H:%M")
@@ -131,8 +132,9 @@ def main():
                 student_smt.append({
                     "Time": timestamp_str,
                     "Late": late,
-                    "Score": int(score),
-                    "MaxScore": int(MaxScore)
+                    "Score": "{:.2f}".format(score),
+                    "MaxScore": int(MaxScore),
+                    "SID": SID
                 })
                 all_score += score
 
@@ -140,7 +142,7 @@ def main():
                 "UID": UID,
                 "Name": Name,
                 "SMT": student_smt,
-                "AllScore": int(all_score)
+                "AllScore": "{:.2f}".format(all_score)
             })
 
         return jsonify({

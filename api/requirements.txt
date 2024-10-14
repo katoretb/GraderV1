@@ -17,3 +17,5 @@ pytz
 tabulate
 flask_sslify
 pyOpenSSL
+qrcode
+Pillow

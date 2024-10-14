@@ -11,6 +11,7 @@ from function.loadconfig import UPLOAD_FOLDER, config
 from function.isLock import isLock
 from function.gradeInBackground import gradeInBackground
 from function.loadconfig import executor
+from function.isAccess import isAccess
 
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import serialization, hashes
@@ -18,12 +19,6 @@ from cryptography.hazmat.primitives import serialization
 from binascii import unhexlify
 
 gmt_timezone = pytz.timezone('Asia/Bangkok')
-
-def delete_file(file_path):
-    if os.path.exists(file_path):
-        os.remove(file_path)
-        return True
-    return False
 
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -52,6 +47,13 @@ def main():
             'msg': "QID is missing in the request",
             'data': {}
         }), 400
+
+    if not isAccess(conn, cursor, Email=Email, QID=QID):
+        return jsonify({
+            'success': False,
+            'msg': 'You do not have access to question.',
+            'data': ""
+        }), 200
 
     try:
 
@@ -139,7 +141,7 @@ def main():
         CSYID = result[2]
         Source = result[3]
         MaxScore = result[4]
-        Qinfo = None if result[6] == None else json.loads(result[6])
+        Qinfo = None if result[6] is None else json.loads(result[6])
 
         # Query to select additional files (addfile) paths related to LID
         select_query = "SELECT Path FROM addfile WHERE LID = %s"
@@ -268,6 +270,20 @@ def main():
             cursor.execute(sus_query, (UID, LID, QID, 5, "There is problem with signature.", upload_time))
             conn.commit()
             
+        upsert_query = """
+            INSERT INTO submitted (UID, LID, QID, SummitedFile, Score, Timestamp, CSYID, OriginalName)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                SummitedFile = VALUES(SummitedFile),
+                Score = VALUES(Score),
+                Timestamp = VALUES(Timestamp),
+                OriginalName = VALUES(OriginalName)
+        """
+
+        # Execute the query with the provided values
+        cursor.execute(upsert_query, (UID, LID, QID, filepath, None, upload_time, CSYID, OriginalFileName))
+        conn.commit()
+        
         executor.submit(gradeInBackground, Source, addfiles, filepath, QID, MaxScore, UID, LID, upload_time, CSYID, OriginalFileName, Qinfo)
 
         return jsonify({

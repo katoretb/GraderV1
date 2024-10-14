@@ -5,12 +5,17 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/Navbar'
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { FileEarmark, Download, Trash } from 'react-bootstrap-icons';
+import { FileEarmark, Download, Trash, PencilSquare, Plus} from 'react-bootstrap-icons';
 
 const host = `${process.env.REACT_APP_HOST}`
 
 function AssignEdit() {
   const navigate = useNavigate();
+  // Modal
+  const [showModal, setShowModal] = useState(false)
+  const [modalEdit, setModalEdit] = useState(false)
+  const [curadf, setcuradf] = useState(false)
+
   // User Data
   const [ClassInfo, setClassInfo] = useState({});
   const [classId,] = useState(sessionStorage.getItem("classId"));
@@ -23,6 +28,8 @@ function AssignEdit() {
   const [dueDate, setDueDate] = useState('')
   const [dueDateLock, setDueDateLock] = useState(false)
   const [showLock, setShowLock] = useState(false)
+  const [isExam, setIsExam] = useState(false)
+  const [isExamFromServ, setIsExamFromServ] = useState(false)
 
   // Question Sys
   const [totalQNum, setTotalQNum] = useState(1);
@@ -54,6 +61,8 @@ function AssignEdit() {
         setDueDate(data.data.DueDate)
         setDueDateLock(data.data.LOD)
         setShowLock(data.data.ShowOnLock)
+        setIsExam(data.data.isExam)
+        setIsExamFromServ(data.data.isExam)
 
         setIsGroup(data.data.IsGroup)
         setSelectList(data.data.SelectList)
@@ -61,7 +70,6 @@ function AssignEdit() {
 
         setTotalQNum(data.data.Question.length)
         setScores(data.data.Question)
-        console.log(data.data.addfile)
         setAddfiles(data.data.addfile)
       }else{
         throw Error(data.msg)
@@ -92,6 +100,8 @@ function AssignEdit() {
           setDueDate(data.data.DueDate)
           setDueDateLock(data.data.LOD)
           setShowLock(data.data.ShowOnLock)
+          setIsExam(data.data.isExam)
+          setIsExamFromServ(data.data.isExam)
   
           setIsGroup(data.data.IsGroup)
           setSelectList(data.data.SelectList)
@@ -99,7 +109,6 @@ function AssignEdit() {
   
           setTotalQNum(data.data.Question.length)
           setScores(data.data.Question)
-          console.log(data.data.addfile)
           setAddfiles(data.data.addfile)
         }else{
           throw Error(data.msg)
@@ -180,12 +189,12 @@ function AssignEdit() {
         html: `
           <div class='row' style="width:100%;">
             <div class='col-6' style="text-align:left;">
-              Lab number<br/>
-              Lab name<br/>
-              Publish<br/>
-              Due<br/>
-              Number of quesitons<br/>
-              Assign to
+              <b>Lab number</b><br/>
+              <b>Lab name</b><br/>
+              <b>Publish</b><br/>
+              <b>Due</b><br/>
+              <b>Number of quesitons</b><br/>
+              <b>Assign to</b>
             </div>
             <div class='col' style="text-align:left">
               ${labNum} <br/>
@@ -205,10 +214,10 @@ function AssignEdit() {
       }).then(async ok => {
         if(ok.isConfirmed){
           const formData = new FormData()
-          const addFiles = await document.getElementById('inputlink').files
-          for(let i=0;i<addFiles.length;i++){
-            formData.append(`Add${i}`, addFiles[i])
-          }
+          // const addFiles = await document.getElementById('inputlink').files
+          // for(let i=0;i<addFiles.length;i++){
+          //   formData.append(`Add${i}`, addFiles[i])
+          // }
 
           for(let i = 0;i < Question.length;i++){
             formData.append(`Source${i}`, document.getElementById(`QSource${Question[i].id}`).files[0])
@@ -223,6 +232,7 @@ function AssignEdit() {
           formData.append("DueDate", dueDate);
           formData.append("LOD", dueDateLock);
           formData.append('ShowOnLock', showLock);
+          formData.append('isExam', isExam);
 
           formData.append('CSYID', classId);
 
@@ -395,27 +405,222 @@ function AssignEdit() {
     .catch(error => console.error('Error:', error));
   }
 
-  const delfile = async (i) => {
-    fetch(`${process.env.REACT_APP_HOST}/TA/class/Assign/delfile`, {
+  const selectall = () => {
+    if(Selected.length === 0){
+      setSelected(SelectList)
+    }else{
+      setSelected([])
+    }
+  }
+
+
+  // Additional files
+  const addfilemodal = async () => {
+    setModalEdit(false)
+    setShowModal(true)
+  }
+
+  const addfile = async () => {
+    if(document.getElementById(`addfiles`).files.length === 0){
+      withReactContent(Swal).fire({
+        title: "Please fill required field in form",
+        icon: "warning"
+      })
+      return;
+    }
+
+    const formData = new FormData()
+
+    const addFiles = await document.getElementById('addfiles').files
+    for(let i=0;i<addFiles.length;i++){
+      formData.append(`Add${i}`, addFiles[i])
+    }
+    
+    formData.append('LID', LID);
+    formData.append('CSYID', classId);
+
+    try {
+      const response = await fetch(`${host}/TA/class/Assign/addfile`, {
         method: 'POST',
         credentials: "include",
         headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-            "X-CSRF-TOKEN": await Cookies.get("csrf_token")
+            "X-CSRF-TOKEN": Cookies.get("csrf_token")
         },
-        body: JSON.stringify({ 
-          fileRequest: `${i}`,
-          CSYID: classId
+        body: formData,
+      })
+      const Data = await response.json()
+      withReactContent(Swal).close()
+
+      if (Data.success){
+        fetchLab()
+        withReactContent(Swal).fire({
+            title: "Added",
+            icon: "success"
         })
+        var file = document.getElementById(`addfiles`);
+        file.value = file.defaultValue;
+    }else{
+        withReactContent(Swal).fire({
+          title: Data.msg,
+          icon: Data.data
+        })
+    }
+    }catch (error) {
+      withReactContent(Swal).fire({
+          title: "Please contact admin!",
+          text: error,
+          icon: "error"
+      })
+    }
+    setShowModal(false)
+  }
+
+  const editfilemodal = async (i) => {
+    setcuradf(i)
+    setModalEdit(true)
+    setShowModal(true)
+  }
+
+  const editfile = async () => {
+    if(document.getElementById(`editfile`).files.length === 0){
+      withReactContent(Swal).fire({
+        title: "Please fill required field in form",
+        icon: "warning"
+      })
+      return;
+    }
+
+    const formData = new FormData()
+
+    formData.append('Add', document.getElementById(`editfile`).files[0])
+    formData.append("ID", curadf)
+    formData.append('CSYID', classId);
+
+    try {
+      const response = await fetch(`${host}/TA/class/Assign/editfile`, {
+        method: 'POST',
+        credentials: "include",
+        headers: {
+            "X-CSRF-TOKEN": Cookies.get("csrf_token")
+        },
+        body: formData,
+      })
+      const Data = await response.json()
+      withReactContent(Swal).close()
+
+      if (Data.success){
+        withReactContent(Swal).fire({
+            title: "Edited",
+            icon: "success"
+        });
+        var file = document.getElementById(`editfile`);
+        file.value = file.defaultValue;
+    }else{
+        withReactContent(Swal).fire({
+          title: Data.msg,
+          icon: Data.data
+        })
+    }
+    }catch (error) {
+      withReactContent(Swal).fire({
+          title: "Please contact admin!",
+          text: error,
+          icon: "error"
+      })
+    }
+    setShowModal(false)
+  }
+
+  const delfile = async (i, name) => {
+    withReactContent(Swal).fire({
+      title: `Are you sure to delete this additional file?`,
+      html: `
+        <div class='row' style="width:100%;">
+          <div class='col-6' style="text-align:right;">
+            <b>Filename:</b>
+          </div>
+          <div class='col' style="text-align:left">
+            ${name}
+          </div>
+        </div>`,
+      icon: "question",
+      showCloseButton: true,
+      showCancelButton: true,
+      focusConfirm: false,
+      confirmButtonText: `Yes`,
+      confirmButtonColor: "rgb(35, 165, 85)",
+    }).then(async ok => {
+      if(ok.isConfirmed){
+        fetch(`${process.env.REACT_APP_HOST}/TA/class/Assign/delfile`, {
+          method: 'POST',
+          credentials: "include",
+          headers: {
+              'Content-Type': 'application/json; charset=UTF-8',
+              "X-CSRF-TOKEN": await Cookies.get("csrf_token")
+          },
+          body: JSON.stringify({ 
+            fileRequest: `${i}`,
+            CSYID: classId
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success){
+              fetchLab()
+              withReactContent(Swal).fire({
+                title: "Deleted",
+                icon: "success"
+              })
+            }else{
+              withReactContent(Swal).fire({
+                title: data.msg,
+                icon: "error"
+              })
+            }
+        })
+        .catch(error => console.error('Error:', error));
+      }
+    })
+  }
+
+  const loadlab = async () => {
+    fetch(`${process.env.REACT_APP_HOST}/TA/class/Assign/downloadLabZip`, {
+      method: 'POST',
+      credentials: "include",
+      headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          "X-CSRF-TOKEN": await Cookies.get("csrf_token")
+      },
+      body: JSON.stringify({ LID: LID})
     })
     .then(response => response.json())
     .then(data => {
         if(data.success){
-          fetchLab()
-          withReactContent(Swal).fire({
-            title: "File deleted",
-            icon: "success"
-          })
+          // Decode base64-encoded file content
+          const decodedFileContent = atob(data.fileContent);
+
+          // Convert decoded content to a Uint8Array
+          const arrayBuffer = new Uint8Array(decodedFileContent.length);
+          for (let i = 0; i < decodedFileContent.length; i++) {
+              arrayBuffer[i] = decodedFileContent.charCodeAt(i);
+          }
+
+          // Create a Blob from the array buffer
+          const blob = new Blob([arrayBuffer], { type: data.fileType });
+
+          // Create a temporary URL to the blob
+          const url = window.URL.createObjectURL(blob);
+
+          // Create a link element to trigger the download
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = data.downloadFilename;
+          document.body.appendChild(a);
+          a.click();
+
+          // Clean up by revoking the object URL
+          window.URL.revokeObjectURL(url);
         }else{
           withReactContent(Swal).fire({
             title: data.msg,
@@ -424,14 +629,6 @@ function AssignEdit() {
         }
     })
     .catch(error => console.error('Error:', error));
-  }
-
-  const selectall = () => {
-    if(Selected.length === 0){
-      setSelected(SelectList)
-    }else{
-      setSelected([])
-    }
   }
 
   return (
@@ -462,12 +659,16 @@ function AssignEdit() {
                   <li className="nav-item">
                       <button className="nav-link link" onClick={() =>{sessionStorage.setItem("LID", LID);sessionStorage.setItem("classId", classId);navigate("/AssignSus")}} >Suspicious</button>
                   </li>
+                  <li className="nav-item">
+                      { isExamFromServ ? (<button className="nav-link link" onClick={() =>{sessionStorage.setItem("LID", LID);sessionStorage.setItem("classId", classId);navigate("/CheckInOut")}} >Check in-out</button>) : ("")}
+                  </li>
                 </ul>
               </div>
               <div className="col-md-5">
-                <button type="button" className="btn btn-danger float-end" style={{marginLeft:"40px"}} id="liveToastBtn" onClick={handleButtonDelete}>Delete</button>
-                <button type="button" className="btn btn-primary float-end" style={{marginLeft:"20px"}} id="liveToastBtn" onClick={handleButtonClick}>Save</button>
+                <button type="button" className="btn btn-danger float-end" style={{marginLeft:"2em"}} id="liveToastBtn" onClick={handleButtonDelete}>Delete</button>
+                <button type="button" className="btn btn-primary float-end" style={{marginLeft:"1em"}} id="liveToastBtn" onClick={handleButtonClick}>Save</button>
                 <button type="button" className="btn btn-primary float-end" onClick={() => navigate("/AssignList")}>Back</button>
+                <button className="btn btn-outline-dark float-end" type="button" onClick={() => {loadlab()}} style={{marginRight: "1em"}}>Download</button>
               </div>
             </div>
           </div>
@@ -487,8 +688,8 @@ function AssignEdit() {
                 </div>
               </div>
               <div className="col">
-                <label htmlFor="inputlink" className="form-label">Additional Files</label>
-                <input type="file" className="form-control" id="inputlink" placeholder="Select file" multiple/>
+                {/* <label htmlFor="inputlink" className="form-label">Additional Files</label>
+                <input type="file" className="form-control" id="inputlink" placeholder="Select file" multiple/> */}
               </div>
             </div>
             <div className="row" style={{marginBottom: "1rem"}}>
@@ -514,7 +715,7 @@ function AssignEdit() {
                       onChange={handleDueDateChange}
                       min={publishDate}
                     />
-                    <input id={`duedatelock`} className="form-check-input" type="checkbox" checked={dueDateLock} onChange={() => setDueDateLock(!dueDateLock)}/>
+                    <input id={`duedatelock`} className="form-check-input" type="checkbox" checked={dueDateLock} onChange={() => setDueDateLock(!dueDateLock)} disabled={isExam}/>
                     <label className="form-check-label" htmlFor="duedatelock" style={{marginLeft: "0.3rem"}}>Close submission on Due date</label>
                   </div>
                 </div>
@@ -524,6 +725,9 @@ function AssignEdit() {
                 <input type="number" min="1" className="form-control" id="inputQnum" value={totalQNum} onChange={handleTotalQNumChange} />
                 <input id={`showlock`} className="form-check-input" type="checkbox" checked={showLock} onChange={() => setShowLock(!showLock)}/>
                 <label className="form-check-label" htmlFor="showlock" style={{marginLeft: "0.3rem"}}>Show the score only after lab is locked.</label>
+                <br/>
+                <input id={`isExam`} className="form-check-input" type="checkbox" checked={isExam} onChange={() => {setIsExam(!isExam);setDueDateLock(true)}}/>
+                <label className="form-check-label" htmlFor="isExam" style={{marginLeft: "0.3rem"}}>Examination mode.</label>
               </div>
             </div>
             <div className="row">
@@ -560,17 +764,26 @@ function AssignEdit() {
                 <br/>
                 <div className='card'>
                   <div className='card-header'>
-                    <h5><Download /> Files</h5>
+                    <div className='row'>
+                      <div className='col'>
+                        <h5><Download /> Files</h5>
+                      </div>
+                      <div className='col-3'>
+                        <button type="button" className="btn btn-outline-success" onClick={addfilemodal}><Plus /> Add</button>
+                      </div>
+                    </div>
+                    
                   </div>
                   <div className='card-body'>
                     {addfiles.map((a, i) => {
                       return <div className='row'>
-                        <div key={`AD${i}`}  className='col' style={{paddingRight: "0px"}}>
+                        <div key={`AD${i}`}  className='col-9' style={{paddingRight: "0px"}}>
                           <button 
                             type="button" 
                             className="btn btn-outline-dark" 
-                            style={{width: "100%", textAlign: "Left", marginBottom: "0.5em"}} 
+                            style={{width: "100%", textAlign: "Left", marginBottom: "0.5em", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap"}} 
                             onClick={() => {downfile(0, 0, a[0])}}
+                            title={a[1]}
                           >
                             <span style={{color: "rgb(255, 178, 62)"}}>
                               <FileEarmark />
@@ -578,15 +791,19 @@ function AssignEdit() {
                              Essential file {i+1}: {a[1]}
                           </button>
                         </div>
-                        <div className='col-1' style={{paddingLeft: "0px"}}>
+                        <div className='col-3' style={{paddingLeft: "0px"}}>
                         <button
                             type="button" 
+                            className="btn btn-outline-warning" 
+                            style={{width: "auto", textAlign: "Left", marginBottom: "0.5em", marginLeft: "0.5em"}} 
+                            onClick={() => {editfilemodal(a[0])}}
+                          ><PencilSquare /></button>
+                          <button
+                            type="button" 
                             className="btn btn-outline-danger" 
-                            style={{width: "100%", textAlign: "Left", marginBottom: "0.5em"}} 
-                            onClick={() => {delfile(a[0])}}
-                          >
-                            <span style={{color: "rgb(174, 8, 8)"}}><Trash /></span>
-                          </button>
+                            style={{width: "auto", textAlign: "Left", marginBottom: "0.5em", marginLeft: "0.5em"}} 
+                            onClick={() => {delfile(a[0], a[1])}}
+                          ><Trash /></button>
                         </div>
                       </div>
                     })}
@@ -640,6 +857,42 @@ function AssignEdit() {
             <br></br>
           </form>
         </div>
+
+
+
+
+        <div className={`modal fade ${showModal ? 'show' : ''}`} tabindex="-1" aria-labelledby="addfileModal" aria-hidden="true" style={{ display: showModal ? 'block' : 'none' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title"><span style={{color: "rgb(255, 178, 62)"}}><FileEarmark /></span> {modalEdit ? "Edit" : "Add"}</h5>
+                <button type="button" className="btn-close" onClick={() => {setShowModal(false)}} aria-label="Close"></button>
+              </div>
+              <div className="modal-body">
+                { modalEdit ? (
+                  <div>
+                    <label htmlFor="inputlink" className="form-label">New file</label>
+                    <input type="file" className="form-control" id="editfile" placeholder="Select file"/>
+                  </div>
+                ):(
+                  <div>
+                    <label htmlFor="inputlink" className="form-label">Add files</label>
+                    <input type="file" className="form-control" id="addfiles" placeholder="Select file(s)" multiple/>
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => {setShowModal(false)}}>Close</button>
+                <button type="button" className="btn btn-primary" onClick={() => {modalEdit ? editfile() : addfile()}}>Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+
+
       </div>
     </div>
   );

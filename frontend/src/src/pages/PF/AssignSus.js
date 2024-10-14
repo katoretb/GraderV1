@@ -119,6 +119,9 @@ function Sentin() {
                                 <li className="nav-item">
                                     <button className="nav-link active" >Suspicious</button>
                                 </li>
+                                <li className="nav-item">
+                                    <button className="nav-link link" onClick={() =>{sessionStorage.setItem("LID", LID);sessionStorage.setItem("classId", classId);navigate("/CheckInOut")}} >Check in-out</button>
+                                </li>
                             </ul>
                         </div>
                         <div className="col-md-2">
