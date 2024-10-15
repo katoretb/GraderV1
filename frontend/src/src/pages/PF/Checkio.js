@@ -145,6 +145,53 @@ function Checkio() {
         })
     }
 
+    const checkallin = async () => {
+      withReactContent(Swal).fire({
+        title: `\nConfirm Check-In`,
+        text: "Are you sure you want to check in all students?",
+        icon: "question",
+        showCloseButton: true,
+        showCancelButton: true,
+        focusConfirm: false,
+        confirmButtonText: `Confirm`,
+        confirmButtonColor: "rgb(35, 165, 85)",
+    }).then(async ok => {
+        if(ok.isConfirmed){
+            try{
+                const response = await fetch(`${host}/TA/class/Assign/Exam/checkinall`, {
+                    method: 'POST',
+                    credentials: "include",
+                    headers: {
+                        "Content-type": "application/json; charset=UTF-8",
+                        "Access-Control-Allow-Origin": "*",
+                        "X-CSRF-TOKEN": Cookies.get("csrf_token")
+                    },
+                    body: JSON.stringify({ LID: LID})
+                })
+                const Data = await response.json()
+                if (Data.success){
+                    withReactContent(Swal).fire({
+                        title: "Complete!",
+                        icon: "success"
+                    })
+                    fetchStudent()
+                }else{
+                    withReactContent(Swal).fire({
+                        title: Data.msg,
+                        icon: Data.data
+                    })
+                }
+            }catch (error) {
+                withReactContent(Swal).fire({
+                    title: "Please contact admin!",
+                    text: error,
+                    icon: "error"
+                })
+            }
+        }
+      })
+    }
+
   return (
     <div>
       <Navbar />
@@ -178,8 +225,9 @@ function Checkio() {
                 </li>
               </ul>
             </div>
-            <div className="col-md-2">
+            <div className="col-md-3">
               <button className="btn btn-primary float-end" type="button" onClick={() => navigate("/AssignList")}>Back</button>
+              <button type="button" className="btn btn-secondary float-end" style={{marginRight:"1em"}} onClick={checkallin}>Check in all</button>
             </div>
           </div>
         </div>
