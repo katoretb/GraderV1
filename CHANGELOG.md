@@ -1,6 +1,16 @@
 
 # Change Log
 
+## [v1.5.6] - 2024-10-15
+ 
+### Added
+ - Check in all button
+
+### Changed
+
+### Fixed
+
+
 ## [v1.5.5] - 2024-10-15
  
 ### Added
