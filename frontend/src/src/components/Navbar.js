@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 function Navbar() {
         const handleButtonClick = () => {};
-        const [version,] = useState("1.5.7")
+        const [version,] = useState("1.5.8")
       
         const [showModal, setShowModal] = useState(false);
       
@@ -24,7 +24,7 @@ function Navbar() {
   return (
     <div>
          <nav className="navbar navbar-dark bg-primary justify-content-between ">
-          <a className="navbar-brand" href="/"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Grader <a style={{fontSize: "0.7em", color: "rgb(203, 203, 203)"}}>{version}</a></a>
+          <a className="navbar-brand" href="/"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Grader <a href="/" style={{fontSize: "0.7em", color: "rgb(203, 203, 203)"}}>{version}</a></a>
           <form className="form-inline">
           <Link to="/">
               <button onClick={handleButtonClick} className="btn btn-outline-light" type="button">Home

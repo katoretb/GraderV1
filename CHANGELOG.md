@@ -1,6 +1,16 @@
 
 # Change Log
 
+## [v1.5.8] - 2024-10-16
+ 
+### Added
+ - Now QRCode can scan with phone camera
+
+### Changed
+
+### Fixed
+
+
 ## [v1.5.7] - 2024-10-16
  
 ### Added
