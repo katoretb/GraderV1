@@ -1,6 +1,16 @@
 
 # Change Log
 
+## [v1.5.9] - 2024-10-16
+ 
+### Added
+ - Support temperary browsing of safari
+
+### Changed
+
+### Fixed
+
+
 ## [v1.5.8] - 2024-10-16
  
 ### Added
