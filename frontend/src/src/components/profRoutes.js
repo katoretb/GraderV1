@@ -1,7 +1,7 @@
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content';
 
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { usePerm } from './usePerm';
 import Cookies from 'js-cookie';
@@ -12,6 +12,9 @@ function ProfRoutes() {
     const [hasPermission, setHasPermission] = useState(false);
     const [loading, setLoading] = useState(true);
     const perm = usePerm();
+    const {id, } = useParams();
+
+    console.log(id)
 
     useEffect(() => {
         async function checkPermissions() {
@@ -28,8 +31,8 @@ function ProfRoutes() {
                 const CSYID = sessionStorage.getItem("classId");
                 const Email = Cookies.get('Email');
 
-                if (CSYID && Email) {
-                    const response = await fetch(`${host}/glob/auth/checkperm?CSYID=${CSYID}`,{
+                if (Email && (CSYID || id)) {
+                    const response = await fetch(`${host}/glob/auth/checkperm?CSYID=${CSYID}&ID=${id}`,{
                         method: "GET",
                         credentials: "include",
                         headers: {
@@ -53,7 +56,7 @@ function ProfRoutes() {
         }
 
         checkPermissions();
-    }, []);
+    }, [id]);
 
     if (loading) {
         return <div></div>;

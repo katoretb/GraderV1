@@ -1,6 +1,15 @@
 
 # Change Log
 
+## [v1.5.10] - 2024-10-16
+ 
+### Added
+
+### Changed
+
+### Fixed
+ - permission DSC
+
 ## [v1.5.9] - 2024-10-16
  
 ### Added
