@@ -13,13 +13,34 @@ def main():
     
     CSYID = request.args.get("CSYID")
     ID = request.args.get("ID")
-    
-    if CSYID is None or ID is None:
+
+    if ID is None:
         return jsonify({
             'success': False,
             'msg': "Invalid request",
             'data': {}
         }), 200
+
+    if CSYID is None or CSYID == "null":
+        query = """ 
+            SELECT
+                CSYID
+            FROM
+                ticket
+            WHERE 
+                ID = %s;
+            """
+        cursor.execute(query, (ID,))
+        cs = cursor.fetchone()
+        if cs is None:
+            return jsonify({
+                'success': False,
+                'msg': "Invalid request",
+                'data': {}
+            }), 200
+        CSYID = cs[0]
+    
+    
 
     if not isCET(conn, cursor, Email, CSYID):
         return jsonify({
@@ -35,7 +56,8 @@ def main():
                 USR.Name, 
                 CONCAT('Lab ', LB.Lab, ' ', LB.Name) AS Lab,
                 TKT.Type,
-                LB.LID
+                LB.LID,
+                TKT.CSYID
             FROM
                 ticket TKT
             JOIN 
@@ -62,7 +84,8 @@ def main():
                 "Name": rqtinfo[1],
                 "Lab": rqtinfo[2],
                 "Type": rqtinfo[3],
-                "LID": rqtinfo[4]
+                "LID": rqtinfo[4],
+                "CSYID": rqtinfo[5]
             }
         }), 200
     except Exception as e:

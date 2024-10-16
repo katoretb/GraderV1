@@ -18,7 +18,8 @@ import Sentin       from '../pages/PF/Sentin';
 import StudentList  from '../pages/PF/StudentList';
 import TAmanage     from '../pages/PF/TAmanage';
 import QRScan       from '../pages/PF/Scan';
-import Checkio       from '../pages/PF/Checkio';
+import Checkio      from '../pages/PF/Checkio';
+import DSC          from '../pages/PF/DirectScan';
 
 // Student
 import Class        from '../pages/ST/Class';
@@ -45,6 +46,7 @@ function App() {
                     <Route element={<StudentList />} path='StudentList' />
                     <Route element={<QRScan />} path='Scan' />
                     <Route element={<Checkio />} path='CheckInOut' />
+                    <Route element={<DSC />} path='DSC/:id' />
 
                 </Route>
                 <Route element={<Home />} path='/' />
