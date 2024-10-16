@@ -69,7 +69,7 @@ def main():
         # Add all aditional files
         for file_path in subf:
             with open(file_path[0], "rb") as f:
-                zip_file.writestr(os.path.split(file_path[0])[-1], f.read())
+                zip_file.writestr(os.path.join("Question_" + file_path[0][-7], os.path.split(file_path[0])[-1]), f.read())
 
 
     zip_buffer.seek(0)
