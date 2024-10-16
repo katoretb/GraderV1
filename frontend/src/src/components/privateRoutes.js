@@ -1,13 +1,14 @@
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content';
 
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, useHref } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 
 function PrivateRoutes() {
     const [Token, setToken] = useState(false);
     const [loading, setLoading] = useState(true);
+    const url = useHref()
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -59,11 +60,29 @@ function PrivateRoutes() {
         checkAuth();
     }, []);
 
+    const remem = () => {
+        if(url.includes("/DSC/")){
+            sessionStorage.setItem("rememberURL", url)
+        }
+        return <Navigate to='login' />
+    }
+
+    const checkremem = () => {
+        const chm = sessionStorage.getItem("rememberURL");
+        if(chm){
+            sessionStorage.removeItem("rememberURL")
+            return <Navigate to={chm} />
+        }
+        return <Outlet />
+    }
+
+    console.log()
+
     if (loading) {
         return <div></div>;
     }
 
-    return Token ? <Outlet /> : <Navigate to='login' />;
+    return Token ? checkremem() : remem();
 }
 
 export default PrivateRoutes;
