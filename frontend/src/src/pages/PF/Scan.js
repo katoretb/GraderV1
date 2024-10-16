@@ -20,7 +20,7 @@ function QRScan() {
     const handleScan = async (result) => {
         setPause(true)
         try{
-            const response = await fetch(`${host}/TA/class/Assign/Exam/scan?CSYID=${classId}&ID=${result[0].rawValue}`, {
+            const response = await fetch(`${host}/TA/class/Assign/Exam/scan?CSYID=${classId}&ID=${result[0].rawValue.split("/").pop()}`, {
                 method: 'GET',
                 credentials: "include",
                 headers: {
@@ -29,6 +29,7 @@ function QRScan() {
             })
             const Data = await response.json()
             if (Data.success){
+                sessionStorage.setItem("classId", Data.data.CSYID)
                 withReactContent(Swal).fire({
                     title: `\nPlease Review these Information`,
                     html: `
@@ -72,10 +73,6 @@ function QRScan() {
             })
             setPause(false)
         }
-        // console.log(result[0].rawValue)
-        // withReactContent(Swal).fire({
-        //     title: result[0].rawValue
-        // })
     }
 
     const rqchkio = async (data) => {
@@ -114,7 +111,7 @@ function QRScan() {
     return (
         <div className='row'>
             <div className='col' style={{padding: "20px"}}>
-                <button type="button" class="btn btn-danger" style={{float: "right", marginRight: "20px"}} onClick={() => navigate("/AssignList")}>Back</button>
+                <button type="button" className="btn btn-danger" style={{float: "right", marginRight: "20px"}} onClick={() => navigate("/AssignList")}>Back</button>
             </div>
             <div className='col'>
                 <div style={{height: "auto", width: "100vmin"}}>

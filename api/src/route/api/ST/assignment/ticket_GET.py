@@ -5,6 +5,7 @@ from io import BytesIO
 
 from function.db import get_db
 from function.GenUUID import generateUUID
+from function.loadconfig import config
 
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -70,8 +71,7 @@ def main():
             conn.commit()
         else:
             ID = data[0]
-        
-        img = qrcode.make(ID)
+        img = qrcode.make(config.get("DOMAIN") + "DSC/" + str(ID))
         buffer = BytesIO()
         img.save(buffer, format="PNG")
         img_bytes = buffer.getvalue()

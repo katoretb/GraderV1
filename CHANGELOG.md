@@ -1,6 +1,45 @@
 
 # Change Log
 
+## [v1.5.10] - 2024-10-16
+ 
+### Added
+
+### Changed
+
+### Fixed
+ - permission DSC
+
+## [v1.5.9] - 2024-10-16
+ 
+### Added
+ - Support temperary browsing of safari
+
+### Changed
+
+### Fixed
+
+
+## [v1.5.8] - 2024-10-16
+ 
+### Added
+ - Now QRCode can scan with phone camera
+
+### Changed
+
+### Fixed
+
+
+## [v1.5.7] - 2024-10-16
+ 
+### Added
+
+### Changed
+ - Download all submission will seperate question to sub directory
+
+### Fixed
+
+
 ## [v1.5.6] - 2024-10-15
  
 ### Added
