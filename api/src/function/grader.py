@@ -150,7 +150,8 @@ def grade(Question, submit, addfile=[], validate=True, timeout=20, check_keyword
                 with stopit.ThreadingTimeout(timeout) as context_manager:
                     with redirect_stdout(output):
                         exec("\n\n".join(finalexec), {})
-                        
+
+                print(output)
                 results = [""]
                 if context_manager.state != context_manager.TIMED_OUT:
                     # return True, f"This submittion have stuck in loop that run longer than {timeout} seconds"
