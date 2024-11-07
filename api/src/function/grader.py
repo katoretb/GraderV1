@@ -162,8 +162,8 @@ def grade(Question, submit, addfile=[], validate=True, timeout=20, check_keyword
                         break
                 if(isPass): temp_cor_p += Qinfo["Points"][num]
 
-            except Exception:
-                pass
+            except Exception as e:
+                print(e)
 
             num += 1
         score.append([temp_cor_p, temp_max_p])
