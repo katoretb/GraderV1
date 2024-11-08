@@ -134,6 +134,7 @@ def grade(Question, submit, addfile=[], validate=True, timeout=20, check_keyword
 
     score = []
     num = 0
+    print(len(solution))
     for solIndex in range(len(solution)):
         temp_max_p = 0
         temp_cor_p = 0
