@@ -57,12 +57,12 @@ jobs:
         name: Edit nginx.conf (DEVELOPMENT)
         if: github.ref_name == 'testing'
         run: |
-          sed -i 's/sci.cugrader.com/dev.cugrader.com/g' ./frontend/nginx.conf
+          sed -i 's/sci.cugrader.com/devcugrader.duckdns.org/g' ./frontend/nginx.conf
       -
         name: Validate nginx.conf (DEVELOPMENT)
         if: github.ref_name == 'testing'
         run: |
-          if grep -q "dev.cugrader.com" ./frontend/nginx.conf && ! grep -q "sci.cugrader.com" ./frontend/nginx.conf; then
+          if grep -q "devcugrader.duckdns.org" ./frontend/nginx.conf && ! grep -q "sci.cugrader.com" ./frontend/nginx.conf; then
             echo "nginx.conf development validation passed"
           else
             echo "nginx.conf development validation failed" && exit 1
