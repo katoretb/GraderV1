@@ -50,7 +50,7 @@ jobs:
         with:
           envkey_PORT: ${{ secrets.TEST_PORT_FRONT }}
           envkey_REACT_APP_HOST: ${{ secrets.TEST_API }}
-          envkey_REACT_APP_DEV: ${{ secrets.TEST_DEV }}
+          envkey_REACT_APP_DEV: true
           file_name: .env
           directory: ./frontend/src/
       -
