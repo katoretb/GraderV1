@@ -9,9 +9,6 @@ from flask_cors import CORS
 from flask import app, Flask, Response, g, send_from_directory, send_file, jsonify
 from flask_jwt_extended import JWTManager
 
-# Google
-# from function.google import secret_key
-
 from function.db import get_db, get_dbdict
 from function.loadconfig import config, UPLOAD_FOLDER, isDev
 
